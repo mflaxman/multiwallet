@@ -190,6 +190,22 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
     return redeem_script.address(testnet=is_testnet)
 
 
+def information(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
+    # TODO: make configurable
+    LIMIT = 10
+    OFFSET = 0
+    for cnt in range(LIMIT):
+        print('cnt', cnt)
+        address = _get_address(
+            pubkey_dicts=pubkeys_info["pubkey_dicts"],
+            quorum_m=pubkeys_info["quorum_m"],
+            quorum_n=pubkeys_info["quorum_n"],
+            index=cnt + OFFSET,
+            is_testnet=pubkeys_info['is_testnet'],
+        )
+        yield self.result.insert(tk.END, f"#{cnt + OFFSET}: {address}\n")
+        
+
 class RecieveFrame(tk.Frame):
     TAB_NAME = "Receive"
 
@@ -207,14 +223,25 @@ class RecieveFrame(tk.Frame):
         self.descriptor_text.grid()
 
         seedpicker_submit_btn = tk.Button(
-            self, text="Calculate Addresses", command=self.descriptor_validation
+            self, text="Calculate Addresses", command=self.run_script
         )
         seedpicker_submit_btn.grid()
 
         self.result = tk.Text(self, height=15)
         self.result.grid_forget()
 
-    def descriptor_validation(self):
+    def do_update(gen, var):
+        DELAY = 100  # in millisecs
+        try:
+            next_value = next(gen)
+        except StopIteration:
+            var.set('Done!')
+        else:
+            var.set(next_value)
+            root.after(DELAY, do_update, gen, var)  # call again after delay
+
+
+    def run_script(self):
         # delete whatever text might have been in the results box
         self.result.delete(1.0, tk.END)
 
@@ -227,24 +254,20 @@ class RecieveFrame(tk.Frame):
             return
 
         # TODO: package with libsec
-
         self.result.grid()
         self.result.insert(tk.END, "Multisig Addresses\n")
 
-        # TODO: make configurable
-        LIMIT = 10
-        OFFSET = 0
-        for cnt in range(LIMIT):
-            print('cnt', cnt)
-            address = _get_address(
-                pubkey_dicts=pubkeys_info["pubkey_dicts"],
-                quorum_m=pubkeys_info["quorum_m"],
-                quorum_n=pubkeys_info["quorum_n"],
-                index=cnt + OFFSET,
-                is_testnet=pubkeys_info['is_testnet'],
-            )
-            yield self.result.insert(tk.END, f"#{cnt + OFFSET}: {address}\n")
-            
+        # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
+        # Create generator obj
+        gen = information(
+            pubkey_dicts=pubkeys_info["pubkey_dicts"],
+            quorum_m=pubkeys_info["quorum_m"],
+            quorum_n=pubkeys_info["quorum_n"],
+            index=cnt + OFFSET,
+            is_testnet=pubkeys_info['is_testnet'],
+        )
+        do_update(gen, var)
+
 
 
 class SpendFrame(tk.Frame):
