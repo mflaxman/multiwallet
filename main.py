@@ -1,5 +1,4 @@
 from tkinter import ttk
-from tkinter import messagebox
 import tkinter as tk
 
 from seedpicker import SeedpickerFrame

@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox  # https://stackoverflow.com/a/29780454/1754586
 
 from buidl.hd import HDPrivateKey
 from buidl.helper import hash256
@@ -42,11 +42,8 @@ class SendFrame(tk.Frame):
         self.bip39_text = tk.Text(self, height=5)
         self.bip39_text.grid()
 
-        psbt_submit_btn = tk.Button(
-            self, text="Sign PSBT", command=self.sign_psbt
-        )
+        psbt_submit_btn = tk.Button(self, text="Sign PSBT", command=self.sign_psbt)
         psbt_submit_btn.grid()
-
 
         self.separator = tk.ttk.Separator(self)
         self.separator.grid_forget()
@@ -72,20 +69,26 @@ class SendFrame(tk.Frame):
         if not psbt_b64 or not bip39_str:
             return
 
+        seed_phrase_num = len(bip39_str.split())
+        if seed_phrase_num not in (12, 15, 18, 21, 24):
+            msg = f"Enter 24 word seed-phrase (you entered {seed_phrase_num} words)"
+            messagebox.showinfo(message=msg)
+            return
+
         # FIXME:
         IS_TESTNET = True
-        UNITS = 'sats'
+        UNITS = "sats"
 
         try:
             hd_priv = HDPrivateKey.from_mnemonic(bip39_str, testnet=IS_TESTNET)
         except Exception as e:
-            tk.messagebox.showinfo(message=f"BIP39 Seed Error: {e}")
+            messagebox.showinfo(message=f"BIP39 Seed Error: {e}")
             return
 
         try:
             psbt_obj = PSBT.parse_base64(psbt_b64, testnet=IS_TESTNET)
         except Exception as e:
-            tk.messagebox.showinfo(message=f"PSBT Parse Error: {e}")
+            messagebox.showinfo(message=f"PSBT Parse Error: {e}")
             return
 
         TX_FEE_SATS = psbt_obj.tx_obj.fee()
@@ -106,7 +109,7 @@ class SendFrame(tk.Frame):
 
             if type(psbt_in.witness_script) != WitnessScript:
                 msg = f"Input #{cnt} does not contain a witness script, this tool can only sign p2wsh transactions."
-                tk.messagebox.showinfo(message=msg)
+                messagebox.showinfo(message=msg)
 
             # Determine quroum_m (and that it hasn't changed between inputs)
             try:
@@ -114,7 +117,9 @@ class SendFrame(tk.Frame):
                     "OP_"
                 )[1]
             except Exception:
-                tk.messagebox.showinfo(message=f"Witness script for input #{cnt} is not p2wsh:\n{psbt_in})")
+                messagebox.showinfo(
+                    message=f"Witness script for input #{cnt} is not p2wsh:\n{psbt_in})"
+                )
                 return
 
             root_path_used = None
@@ -141,7 +146,8 @@ class SendFrame(tk.Frame):
                 ),
             }
             if not root_path_used:
-                tk.messagebox.showinfo(message=f"This key is not a participant in input #{cnt}:\n{input_desc}")
+                msg = f"This key is not a participant in input #{cnt}:\n{input_desc}"
+                messagebox.showinfo(message=msg)
                 return
 
             inputs_desc.append(input_desc)
@@ -150,7 +156,7 @@ class SendFrame(tk.Frame):
             x["msig_digest"] == inputs_desc[0]["msig_digest"] for x in inputs_desc
         ):
             msg = "Multiple different multisig quorums in inputs. Construct a transaction with one input to continue."
-            tk.messagebox.showinfo(message=msg)
+            messagebox.showinfo(message=msg)
             return
 
         TOTAL_INPUT_SATS = sum([x["sats"] for x in inputs_desc])
@@ -158,7 +164,7 @@ class SendFrame(tk.Frame):
         # This too only supports TXs with 1-2 outputs (sweep TX OR spend+change TX):
         if len(psbt_obj.psbt_outs) > 2:
             msg = f"This tool does not support batching, your transaction has {len(psbt_obj.psbt_outs)} outputs. Please construct a transaction with <= 2 outputs."
-            tk.messagebox.showinfo(message=msg)
+            messagebox.showinfo(message=msg)
             return
 
         spend_addr, output_spend_sats = "", 0
@@ -197,7 +203,7 @@ class SendFrame(tk.Frame):
                     )[1]
                 except Exception:
                     msg = f"Witness script for input #{cnt} is not p2wsh:\n{psbt_in})"
-                    tk.messagebox.showinfo(message=msg)
+                    messagebox.showinfo(message=msg)
                     return
 
                 output_msig_digest = _calculate_msig_digest(
@@ -207,7 +213,7 @@ class SendFrame(tk.Frame):
                     output_msig_digest != inputs_desc[0]["msig_digest"]
                 ):  # ALL inputs have the same msig_digest
                     msg = f"Output #{cnt} is claiming to be change but has different multisig wallet(s)! Do a sweep transaction (1-output) if you want this wallet to cosign."
-                    tk.messagebox.showinfo(message=msg)
+                    messagebox.showinfo(message=msg)
                     return
             else:
                 output_desc["is_change"] = False
@@ -219,7 +225,7 @@ class SendFrame(tk.Frame):
         # Sanity check
         if len(outputs_desc) != len(psbt_obj.psbt_outs):
             msg = f"{len(outputs_desc)} outputs in summary doesn't match {len(psbt_obj.psbt_outs)} outputs in PSBT"
-            tk.messagebox.showinfo(message=msg)
+            messagebox.showinfo(message=msg)
             return
 
         # Confirm if 2 outputs we only have 1 change and 1 spend (can't be 2 changes or 2 spends)
@@ -228,7 +234,7 @@ class SendFrame(tk.Frame):
                 x["is_change"] == outputs_desc[0]["is_change"] for x in outputs_desc
             ):
                 msg = f"Cannot have both outputs be change or spend, must be 1-and-1. {outputs_desc}"
-                tk.messagebox.showinfo(message=msg)
+                messagebox.showinfo(message=msg)
                 return
 
         self.separator.grid(sticky="ew")
@@ -275,5 +281,5 @@ class SendFrame(tk.Frame):
             self.signed_psbt_result.insert(tk.END, psbt_obj.serialize_base64())
             self.signed_psbt_result.grid()
         else:
-            tk.messagebox.showinfo(message="PSBT wasn't signed")
+            messagebox.showinfo(message="PSBT wasn't signed")
             return

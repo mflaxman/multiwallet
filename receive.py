@@ -5,8 +5,6 @@ from buidl.helper import sha256
 from buidl.op import OP_CODE_NAMES_LOOKUP
 from buidl.script import P2WSHScriptPubKey, WitnessScript
 
-from tkinter import ttk
-from tkinter import messagebox
 import tkinter as tk
 
 
@@ -99,9 +97,7 @@ class ReceiveFrame(tk.Frame):
         self.parent = parent
         self.frame = tk.Frame.__init__(self, parent)
 
-        label = tk.Label(
-            self, text="Paste Output Descriptor from Specter-Desktop:"
-        )
+        label = tk.Label(self, text="Paste Output Descriptor from Specter-Desktop:")
         label.grid()
 
         self.descriptor_text = tk.Text(self, height=15)
