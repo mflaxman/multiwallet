@@ -190,20 +190,19 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
     return redeem_script.address(testnet=is_testnet)
 
 
-def information(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
-    # TODO: make configurable
-    LIMIT = 10
-    OFFSET = 0
-    for cnt in range(LIMIT):
-        print('cnt', cnt)
+def information(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
+    # Create generator obj
+    for cnt in range(limit):
+        index = cnt+offset
+        print('index', index)
         address = _get_address(
-            pubkey_dicts=pubkeys_info["pubkey_dicts"],
-            quorum_m=pubkeys_info["quorum_m"],
-            quorum_n=pubkeys_info["quorum_n"],
-            index=cnt + OFFSET,
-            is_testnet=pubkeys_info['is_testnet'],
+            pubkey_dicts=pubkey_dicts,
+            quorum_m=quorum_m,
+            quorum_n=quorum_n,
+            index=index,
+            is_testnet=is_testnet,
         )
-        yield self.result.insert(tk.END, f"#{cnt + OFFSET}: {address}\n")
+        yield index, address
         
 
 class RecieveFrame(tk.Frame):
@@ -230,15 +229,18 @@ class RecieveFrame(tk.Frame):
         self.result = tk.Text(self, height=15)
         self.result.grid_forget()
 
-    def do_update(gen, var):
-        DELAY = 100  # in millisecs
+    def do_update(self, gen, var):
+        # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
+        DELAY = 1  # in millisecs
         try:
             next_value = next(gen)
         except StopIteration:
-            var.set('Done!')
+            print("Done")
         else:
-            var.set(next_value)
-            root.after(DELAY, do_update, gen, var)  # call again after delay
+            self.result.insert(tk.END, f"#{next_value[0]}: {next_value[1]}\n")
+            # import pdb; pdb.set_trace()
+            # self.parent.master
+            self.parent.after(DELAY, self.do_update, gen, var)  # call again after delay
 
 
     def run_script(self):
@@ -258,15 +260,19 @@ class RecieveFrame(tk.Frame):
         self.result.insert(tk.END, "Multisig Addresses\n")
 
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
-        # Create generator obj
-        gen = information(
+        # TODO: make configurable
+        OFFSET = 0
+        LIMIT = 10
+        var = dict (
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
             quorum_n=pubkeys_info["quorum_n"],
-            index=cnt + OFFSET,
+            limit=LIMIT,
+            offset=OFFSET,
             is_testnet=pubkeys_info['is_testnet'],
         )
-        do_update(gen, var)
+        gen = information(**var)
+        self.do_update(gen, var)
 
 
 
