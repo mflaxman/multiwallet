@@ -42,11 +42,8 @@ class SendFrame(tk.Frame):
         self.bip39_text = tk.Text(self, height=5)
         self.bip39_text.grid()
 
-        psbt_submit_btn = tk.Button(
-            self, text="Sign PSBT", command=self.sign_psbt
-        )
+        psbt_submit_btn = tk.Button(self, text="Sign PSBT", command=self.sign_psbt)
         psbt_submit_btn.grid()
-
 
         self.separator = tk.ttk.Separator(self)
         self.separator.grid_forget()
@@ -74,7 +71,7 @@ class SendFrame(tk.Frame):
 
         # FIXME:
         IS_TESTNET = True
-        UNITS = 'sats'
+        UNITS = "sats"
 
         try:
             hd_priv = HDPrivateKey.from_mnemonic(bip39_str, testnet=IS_TESTNET)
@@ -114,7 +111,9 @@ class SendFrame(tk.Frame):
                     "OP_"
                 )[1]
             except Exception:
-                tk.messagebox.showinfo(message=f"Witness script for input #{cnt} is not p2wsh:\n{psbt_in})")
+                tk.messagebox.showinfo(
+                    message=f"Witness script for input #{cnt} is not p2wsh:\n{psbt_in})"
+                )
                 return
 
             root_path_used = None
@@ -141,7 +140,9 @@ class SendFrame(tk.Frame):
                 ),
             }
             if not root_path_used:
-                tk.messagebox.showinfo(message=f"This key is not a participant in input #{cnt}:\n{input_desc}")
+                tk.messagebox.showinfo(
+                    message=f"This key is not a participant in input #{cnt}:\n{input_desc}"
+                )
                 return
 
             inputs_desc.append(input_desc)

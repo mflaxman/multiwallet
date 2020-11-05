@@ -99,9 +99,7 @@ class ReceiveFrame(tk.Frame):
         self.parent = parent
         self.frame = tk.Frame.__init__(self, parent)
 
-        label = tk.Label(
-            self, text="Paste Output Descriptor from Specter-Desktop:"
-        )
+        label = tk.Label(self, text="Paste Output Descriptor from Specter-Desktop:")
         label.grid()
 
         self.descriptor_text = tk.Text(self, height=15)
