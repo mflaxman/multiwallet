@@ -73,7 +73,7 @@ class SendFrame(tk.Frame):
             return
 
         # FIXME:
-        IS_TESTNET = False
+        IS_TESTNET = True
         UNITS = 'sats'
 
         try:
@@ -83,7 +83,7 @@ class SendFrame(tk.Frame):
             return
 
         try:
-            psbt_obj = PSBT.parse_base64(psbt_b64)  # FIXME:, testnet=IS_TESTNET)
+            psbt_obj = PSBT.parse_base64(psbt_b64, testnet=IS_TESTNET)
         except Exception as e:
             tk.messagebox.showinfo(message=f"PSBT Parse Error: {e}")
             return
