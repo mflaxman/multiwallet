@@ -186,7 +186,7 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
     return redeem_script.address(testnet=is_testnet)
 
 
-def information(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
+def _yield_address(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
     # Create generator obj
     for cnt in range(limit):
         index = cnt + offset
@@ -210,7 +210,7 @@ class RecieveFrame(tk.Frame):
         self.frame = tk.Frame.__init__(self, parent)
 
         label = tk.Label(
-            self, text="Verify Recieve Addresses (paste output descriptor):"
+            self, text="Paste Output Descriptor from Specter-Desktop:"
         )
         label.grid()
 
@@ -218,7 +218,7 @@ class RecieveFrame(tk.Frame):
         self.descriptor_text.grid()
 
         seedpicker_submit_btn = tk.Button(
-            self, text="Calculate Addresses", command=self.run_script
+            self, text="Calculate Addresses", command=self.calc_addresses
         )
         seedpicker_submit_btn.grid()
 
@@ -238,9 +238,10 @@ class RecieveFrame(tk.Frame):
             # self.parent.master
             self.parent.after(DELAY, self.do_update, gen, var)  # call again after delay
 
-    def run_script(self):
+    def calc_addresses(self):
         # delete whatever text might have been in the results box
         self.result.delete(1.0, tk.END)
+        self.result.grid_forget()
 
         descriptor = self.descriptor_text.get("1.0", tk.END).replace("  ", " ").strip()
         if not descriptor:
@@ -252,13 +253,13 @@ class RecieveFrame(tk.Frame):
 
         # TODO: package with libsec
         self.result.grid()
-        self.result.insert(tk.END, "Multisig Addresses\n")
+        self.result.insert(tk.END, "Multisig Addresses:\n\n")
 
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
         # TODO: make configurable
         OFFSET = 0
         LIMIT = 10
-        var = dict(
+        kwargs = dict(
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
             quorum_n=pubkeys_info["quorum_n"],
@@ -266,8 +267,8 @@ class RecieveFrame(tk.Frame):
             offset=OFFSET,
             is_testnet=pubkeys_info["is_testnet"],
         )
-        gen = information(**var)
-        self.do_update(gen, var)
+        yield_func = _yield_address(**kwargs)
+        self.do_update(yield_func, kwargs)
 
 
 class SpendFrame(tk.Frame):
