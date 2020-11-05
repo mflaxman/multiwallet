@@ -37,7 +37,7 @@ class SeedpickerFrame(tk.Frame):
         self.text.grid()
 
         seedpicker_submit_btn = tk.Button(
-            self, text="Calculate", command=self.first_words_validation
+            self, text="Calculate Last Word", command=self.first_words_validation
         )
         seedpicker_submit_btn.grid()
 

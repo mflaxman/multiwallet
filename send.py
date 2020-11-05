@@ -47,18 +47,25 @@ class SendFrame(tk.Frame):
         )
         psbt_submit_btn.grid()
 
-        self.tx_summary_label = tk.Label(self, text="")
+
+        self.separator = tk.ttk.Separator(self)
+        self.separator.grid_forget()
+
+        self.tx_summary_label = tk.Message(self, text="", width=800)
         self.tx_summary_label.grid_forget()
 
         self.signed_psbt_result = tk.Text(self, height=10)
         self.signed_psbt_result.grid_forget()
 
     def sign_psbt(self):
+        # Clear state:
+        self.separator.grid_forget()
         self.signed_psbt_result.delete(1.0, tk.END)
         self.signed_psbt_result.grid_forget()
-        # self.tx_summary_label.delete(1.0, tk.END)  # FIXME
+        self.tx_summary_label.config(text="")
         self.tx_summary_label.grid_forget()
 
+        # fetch values
         psbt_b64 = self.psbt_text.get("1.0", tk.END).replace("  ", " ").strip()
         bip39_str = self.bip39_text.get("1.0", tk.END).replace("  ", " ").strip()
 
@@ -232,8 +239,7 @@ class SendFrame(tk.Frame):
         TX_SUMMARY = " ".join(
             [
                 "TX Summary:",
-                "",
-                "send",
+                "\nSend",
                 _format_satoshis(output_spend_sats, in_btc=UNITS == "btc"),
                 "to",
                 spend_addr,
@@ -242,9 +248,11 @@ class SendFrame(tk.Frame):
                 f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
+        print(TX_SUMMARY)  # FIXME
+
+        self.separator.grid(sticky="ew")
         self.tx_summary_label.config(text=TX_SUMMARY)
         self.tx_summary_label.grid()
-        print(TX_SUMMARY)  # FIXME
 
         if True:
             # TODO: move this to UI

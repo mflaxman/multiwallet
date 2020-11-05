@@ -109,7 +109,7 @@ class ReceiveFrame(tk.Frame):
         self.descriptor_text.grid()
 
         seedpicker_submit_btn = tk.Button(
-            self, text="Calculate Addresses", command=self.calc_addresses
+            self, text="Verify Addresses", command=self.calc_addresses
         )
         seedpicker_submit_btn.grid()
 
