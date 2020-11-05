@@ -231,6 +231,8 @@ class SendFrame(tk.Frame):
                 tk.messagebox.showinfo(message=msg)
                 return
 
+        self.separator.grid(sticky="ew")
+
         # Derive list of child private keys we'll use to sign the TX
         private_keys = []
         for root_path in set([x["root_path_used"] for x in inputs_desc]):
@@ -238,8 +240,7 @@ class SendFrame(tk.Frame):
 
         TX_SUMMARY = " ".join(
             [
-                "TX Summary:",
-                "\nSend",
+                "Signed PSBT sending",
                 _format_satoshis(output_spend_sats, in_btc=UNITS == "btc"),
                 "to",
                 spend_addr,
@@ -248,9 +249,6 @@ class SendFrame(tk.Frame):
                 f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
-        print(TX_SUMMARY)  # FIXME
-
-        self.separator.grid(sticky="ew")
         self.tx_summary_label.config(text=TX_SUMMARY)
         self.tx_summary_label.grid()
 
@@ -274,9 +272,6 @@ class SendFrame(tk.Frame):
             print("\n".join(to_print))
 
         if psbt_obj.sign_with_private_keys(private_keys) is True:
-            print()
-            print("Signed PSBT to broadcast:\n")
-            print(psbt_obj.serialize_base64())
             self.signed_psbt_result.insert(tk.END, psbt_obj.serialize_base64())
             self.signed_psbt_result.grid()
         else:

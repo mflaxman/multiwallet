@@ -81,7 +81,6 @@ def _yield_address(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
     # Create generator obj
     for cnt in range(limit):
         index = cnt + offset
-        print("index", index)
         address = _get_address(
             pubkey_dicts=pubkey_dicts,
             quorum_m=quorum_m,

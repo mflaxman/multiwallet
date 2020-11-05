@@ -51,7 +51,6 @@ class SeedpickerFrame(tk.Frame):
         first_words = self.text.get("1.0", tk.END).replace("  ", " ").strip()
         if not first_words:
             return
-        print("first_words", first_words)
 
         fw_num = len(first_words.split())
         if fw_num not in (11, 14, 17, 20, 23):
@@ -69,7 +68,6 @@ class SeedpickerFrame(tk.Frame):
                 "The following are not valid:",
             ]
             msg.extend([f"  word #{x[0]} {x[1]}" for x in wordlist_errors])
-            print("msg", msg)
             tk.messagebox.showinfo(message="\n".join(msg))
             return
 
