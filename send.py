@@ -47,12 +47,17 @@ class SendFrame(tk.Frame):
         )
         psbt_submit_btn.grid()
 
-        self.result = tk.Text(self, height=10)
-        self.result.grid_forget()
+        self.tx_summary_label = tk.Label(self, text="")
+        self.tx_summary_label.grid_forget()
+
+        self.signed_psbt_result = tk.Text(self, height=10)
+        self.signed_psbt_result.grid_forget()
 
     def sign_psbt(self):
-        self.result.delete(1.0, tk.END)
-        self.result.grid_forget()
+        self.signed_psbt_result.delete(1.0, tk.END)
+        self.signed_psbt_result.grid_forget()
+        # self.tx_summary_label.delete(1.0, tk.END)  # FIXME
+        self.tx_summary_label.grid_forget()
 
         psbt_b64 = self.psbt_text.get("1.0", tk.END).replace("  ", " ").strip()
         bip39_str = self.bip39_text.get("1.0", tk.END).replace("  ", " ").strip()
@@ -77,8 +82,6 @@ class SendFrame(tk.Frame):
             return
 
         TX_FEE_SATS = psbt_obj.tx_obj.fee()
-
-        # self.result.insert(tk.END, f"#{next_value[0]}: {next_value[1]}\n")
 
         # Validate multisig transaction
         # TODO: abstract some of this into buidl library?
@@ -228,7 +231,9 @@ class SendFrame(tk.Frame):
 
         TX_SUMMARY = " ".join(
             [
-                "PSBT sends",
+                "TX Summary:",
+                "",
+                "send",
                 _format_satoshis(output_spend_sats, in_btc=UNITS == "btc"),
                 "to",
                 spend_addr,
@@ -237,6 +242,8 @@ class SendFrame(tk.Frame):
                 f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
+        self.tx_summary_label.config(text=TX_SUMMARY)
+        self.tx_summary_label.grid()
         print(TX_SUMMARY)  # FIXME
 
         if True:
@@ -259,10 +266,11 @@ class SendFrame(tk.Frame):
             print("\n".join(to_print))
 
         if psbt_obj.sign_with_private_keys(private_keys) is True:
-            # FIXME
             print()
             print("Signed PSBT to broadcast:\n")
             print(psbt_obj.serialize_base64())
+            self.signed_psbt_result.insert(tk.END, psbt_obj.serialize_base64())
+            self.signed_psbt_result.grid()
         else:
             tk.messagebox.showinfo(message="PSBT wasn't signed")
             return
