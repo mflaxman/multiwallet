@@ -1,9 +1,14 @@
 from tkinter import ttk
-import tkinter as tk
 from tkinter import messagebox
+import tkinter as tk
 
-from buidl.hd import HDPrivateKey
-from buidl.mnemonic import secure_mnemonic, WORD_LOOKUP, WORD_LIST
+from buidl.hd import HDPrivateKey, HDPublicKey
+from buidl.helper import sha256
+from buidl.mnemonic import WORD_LOOKUP, WORD_LIST
+from buidl.op import OP_CODE_NAMES_LOOKUP
+from buidl.script import P2WSHScriptPubKey, WitnessScript
+
+import re
 
 
 def _get_all_valid_checksum_words(first_words):
@@ -29,8 +34,7 @@ class SeedpickerFrame(tk.Frame):
         self.parent = parent
         self.frame = tk.Frame.__init__(self, parent)
 
-        label = tk.Label(self, text='Enter first 23 words of seed:')
-        # label.pack(fill ="both", expand=True, padx=20, pady=10)
+        label = tk.Label(self, text="Enter first 23 words of your seed:")
         label.grid(column=0, row=1)
 
         # https://python-textbok.readthedocs.io/en/1.0/Introduction_to_GUI_Programming.html
@@ -38,11 +42,19 @@ class SeedpickerFrame(tk.Frame):
         self.text = tk.Text(self, height=5)
         self.text.grid()
 
-        seedpicker_submit_btn = tk.Button(self, text="Calculate", command=self.first_words_validation)
+        seedpicker_submit_btn = tk.Button(
+            self, text="Calculate", command=self.first_words_validation
+        )
         seedpicker_submit_btn.grid()
 
+        self.result = tk.Text(self, height=15)
+        self.result.grid_forget()
+
     def first_words_validation(self):
-        first_words = self.text.get("1.0",tk.END).replace("  "," ").strip()
+        # delete whatever text might have been in the results box
+        self.result.delete(1.0, tk.END)
+
+        first_words = self.text.get("1.0", tk.END).replace("  ", " ").strip()
         if not first_words:
             return
         print("first_words", first_words)
@@ -56,10 +68,12 @@ class SeedpickerFrame(tk.Frame):
         wordlist_errors = []
         for cnt, word in enumerate(first_words.split()):
             if word not in WORD_LOOKUP:
-                wordlist_errors.append([cnt+1, word])
+                wordlist_errors.append([cnt + 1, word])
         if wordlist_errors:
             # self.text.config(fg='red') (need a UI to turn this off on typing)
-            msg = ["The following are not valid:",]
+            msg = [
+                "The following are not valid:",
+            ]
             msg.extend([f"  word #{x[0]} {x[1]}" for x in wordlist_errors])
             print("msg", msg)
             tk.messagebox.showinfo(message="\n".join(msg))
@@ -100,24 +114,137 @@ class SeedpickerFrame(tk.Frame):
             ),
         ]
 
-        self.result = tk.Text(self, height=15)
         self.result.insert(tk.END, "\n".join(to_display))
         # TODO: disable editing in a way that still allows copy-paste
         self.result.grid()
 
 
+def _re_pubkey_info_from_descriptor_fragment(fragment):
+    xfp, path, xpub, idx = re.match(
+        "\[([0-9a-f]+)\*?(.*?)\]([0-9A-Za-z]+).*([0-9]+?)",  # noqa: W605
+        fragment,
+    ).groups()
+    return {
+        "xfp": xfp,
+        "path": path.replace("\\/", "/").lstrip("/"),
+        "xpub": xpub,
+        "idx": int(idx),
+    }
+
+
+def _get_pubkeys_info_from_descriptor(descriptor):
+    re_results = re.findall("wsh\(sortedmulti\((.*)\)\)", descriptor)  # noqa: W605
+    parts = re_results[0].split(",")
+    quorum_m = int(parts.pop(0))
+    quorum_n = len(parts)  # remaining entries are pubkeys with fingerprint/path
+    assert 0 < quorum_m <= quorum_n
+
+    pubkey_dicts = []
+    for fragment in parts:
+        pubkey_info = _re_pubkey_info_from_descriptor_fragment(fragment=fragment)
+        parent_pubkey_obj = HDPublicKey.parse(pubkey_info["xpub"])
+        pubkey_info["parent_pubkey_obj"] = parent_pubkey_obj
+        pubkey_info["child_pubkey_obj"] = parent_pubkey_obj.child(
+            index=pubkey_info["idx"]
+        )
+        pubkey_dicts.append(pubkey_info)
+
+    # safety check
+    all_pubkeys = [x["xpub"] for x in pubkey_dicts]
+    assert (
+        len(set([x[:4] for x in all_pubkeys])) == 1
+    ), "ERROR: multiple conflicting networks in pubkeys: {}".format(all_pubkeys)
+
+    xpub_prefix = all_pubkeys[0][:4]
+    if xpub_prefix == "tpub":
+        is_testnet = True
+    elif xpub_prefix == "xpub":
+        is_testnet = False
+    else:
+        raise Exception(f"Invalid xpub prefix: {xpub_prefix}")
+
+    return {
+        "is_testnet": is_testnet,
+        "quorum_m": quorum_m,
+        "quorum_n": quorum_n,
+        "pubkey_dicts": pubkey_dicts,
+    }
+
+
+def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
+    sec_hexes_to_use = []
+    for pubkey_dict in pubkey_dicts:
+        leaf_xpub = pubkey_dict["child_pubkey_obj"].child(index=index)
+        sec_hexes_to_use.append(leaf_xpub.sec().hex())
+
+    commands = [OP_CODE_NAMES_LOOKUP["OP_{}".format(quorum_m)]]
+    commands.extend(
+        [bytes.fromhex(x) for x in sorted(sec_hexes_to_use)]  # BIP67
+    )
+    commands.append(
+        OP_CODE_NAMES_LOOKUP["OP_{}".format(quorum_n)]
+    )
+    commands.append(OP_CODE_NAMES_LOOKUP["OP_CHECKMULTISIG"])
+    witness_script = WitnessScript(commands)
+    redeem_script = P2WSHScriptPubKey(sha256(witness_script.raw_serialize()))
+    return redeem_script.address(testnet=is_testnet)
+
 
 class RecieveFrame(tk.Frame):
     TAB_NAME = "Receive"
-    
+
     def __init__(self, parent):
         # TODO: WET
         self.parent = parent
         self.frame = tk.Frame.__init__(self, parent)
 
-        label = tk.Label(self, text="Verify Recieve Addresses")
-        label.pack(fill ="both", expand=True, padx=20, pady=10)
+        label = tk.Label(
+            self, text="Verify Recieve Addresses (paste output descriptor):"
+        )
+        label.grid()
 
+        self.descriptor_text = tk.Text(self, height=15)
+        self.descriptor_text.grid()
+
+        seedpicker_submit_btn = tk.Button(
+            self, text="Calculate Addresses", command=self.descriptor_validation
+        )
+        seedpicker_submit_btn.grid()
+
+        self.result = tk.Text(self, height=15)
+        self.result.grid_forget()
+
+    def descriptor_validation(self):
+        # delete whatever text might have been in the results box
+        self.result.delete(1.0, tk.END)
+
+        descriptor = self.descriptor_text.get("1.0", tk.END).replace("  ", " ").strip()
+        if not descriptor:
+            return
+
+        pubkeys_info = _get_pubkeys_info_from_descriptor(descriptor)
+        if not pubkeys_info:
+            return
+
+        # TODO: package with libsec
+
+        self.result.grid()
+        self.result.insert(tk.END, "Multisig Addresses\n")
+
+        # TODO: make configurable
+        LIMIT = 10
+        OFFSET = 0
+        for cnt in range(LIMIT):
+            print('cnt', cnt)
+            address = _get_address(
+                pubkey_dicts=pubkeys_info["pubkey_dicts"],
+                quorum_m=pubkeys_info["quorum_m"],
+                quorum_n=pubkeys_info["quorum_n"],
+                index=cnt + OFFSET,
+                is_testnet=pubkeys_info['is_testnet'],
+            )
+            yield self.result.insert(tk.END, f"#{cnt + OFFSET}: {address}\n")
+            
 
 
 class SpendFrame(tk.Frame):
@@ -129,11 +256,12 @@ class SpendFrame(tk.Frame):
         self.frame = tk.Frame.__init__(self, parent)
 
         label = tk.Label(self, text="Spend via PSBT")
-        label.pack(fill ="both", expand=True, padx=20, pady=10)
+        label.pack(fill="both", expand=True, padx=20, pady=10)
 
 
 class Multiwallet(tk.Frame):
     TITLE = "Multiwallet - Stateless PSBT Multisig Wallet"
+
     def __init__(self):
         self.root = tk.Tk()
         self.root.title(self.TITLE)
@@ -150,7 +278,6 @@ class Multiwallet(tk.Frame):
             self.notebook.add(frame, text=frame.TAB_NAME)
 
         self.pack(fill="both", expand=True)
-
 
     def run(self):
         self.root.mainloop()
