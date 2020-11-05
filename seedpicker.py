@@ -33,7 +33,6 @@ class SeedpickerFrame(tk.Frame):
         label.grid(column=0, row=1)
 
         # https://python-textbok.readthedocs.io/en/1.0/Introduction_to_GUI_Programming.html
-        # vcmd = parent.register(self.validate) # we have to wrap the command
         self.text = tk.Text(self, height=5)
         self.text.grid()
 
