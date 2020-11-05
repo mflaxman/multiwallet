@@ -1,9 +1,8 @@
 from buidl.hd import HDPrivateKey
 from buidl.mnemonic import WORD_LOOKUP, WORD_LIST
 
-from tkinter import ttk
-from tkinter import messagebox
 import tkinter as tk
+from tkinter import messagebox  # https://stackoverflow.com/a/29780454/1754586
 
 
 def _get_all_valid_checksum_words(first_words):
@@ -56,7 +55,8 @@ class SeedpickerFrame(tk.Frame):
         if fw_num not in (11, 14, 17, 20, 23):
             # TODO: 11, 14, 17, or 20 word seed phrases also work but this is not documented as it's for advanced users
             err = f"Enter 23 word seed-phrase (you entered {fw_num} words)"
-            tk.messagebox.showinfo(message=err)
+            messagebox.showinfo(message=err)
+            return
 
         wordlist_errors = []
         for cnt, word in enumerate(first_words.split()):
@@ -68,14 +68,14 @@ class SeedpickerFrame(tk.Frame):
                 "The following are not valid:",
             ]
             msg.extend([f"  word #{x[0]} {x[1]}" for x in wordlist_errors])
-            tk.messagebox.showinfo(message="\n".join(msg))
+            messagebox.showinfo(message="\n".join(msg))
             return
 
         # self.text.config(fg='black')
 
         valid_checksum_words, err_str = _get_all_valid_checksum_words(first_words)
         if err_str:
-            tk.messagebox.showinfo(f"Error calculating checksum word: {err_str}")
+            messagebox.showinfo(f"Error calculating checksum word: {err_str}")
             return
 
         IS_TESTNET = True  # TESTNET ONLY FOR NOW

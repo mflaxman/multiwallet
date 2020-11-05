@@ -5,8 +5,6 @@ from buidl.helper import sha256
 from buidl.op import OP_CODE_NAMES_LOOKUP
 from buidl.script import P2WSHScriptPubKey, WitnessScript
 
-from tkinter import ttk
-from tkinter import messagebox
 import tkinter as tk
 
 
