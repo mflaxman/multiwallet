@@ -178,12 +178,8 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
         sec_hexes_to_use.append(leaf_xpub.sec().hex())
 
     commands = [OP_CODE_NAMES_LOOKUP["OP_{}".format(quorum_m)]]
-    commands.extend(
-        [bytes.fromhex(x) for x in sorted(sec_hexes_to_use)]  # BIP67
-    )
-    commands.append(
-        OP_CODE_NAMES_LOOKUP["OP_{}".format(quorum_n)]
-    )
+    commands.extend([bytes.fromhex(x) for x in sorted(sec_hexes_to_use)])  # BIP67
+    commands.append(OP_CODE_NAMES_LOOKUP["OP_{}".format(quorum_n)])
     commands.append(OP_CODE_NAMES_LOOKUP["OP_CHECKMULTISIG"])
     witness_script = WitnessScript(commands)
     redeem_script = P2WSHScriptPubKey(sha256(witness_script.raw_serialize()))
@@ -193,8 +189,8 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
 def information(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
     # Create generator obj
     for cnt in range(limit):
-        index = cnt+offset
-        print('index', index)
+        index = cnt + offset
+        print("index", index)
         address = _get_address(
             pubkey_dicts=pubkey_dicts,
             quorum_m=quorum_m,
@@ -203,7 +199,7 @@ def information(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
             is_testnet=is_testnet,
         )
         yield index, address
-        
+
 
 class RecieveFrame(tk.Frame):
     TAB_NAME = "Receive"
@@ -242,7 +238,6 @@ class RecieveFrame(tk.Frame):
             # self.parent.master
             self.parent.after(DELAY, self.do_update, gen, var)  # call again after delay
 
-
     def run_script(self):
         # delete whatever text might have been in the results box
         self.result.delete(1.0, tk.END)
@@ -263,17 +258,16 @@ class RecieveFrame(tk.Frame):
         # TODO: make configurable
         OFFSET = 0
         LIMIT = 10
-        var = dict (
+        var = dict(
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
             quorum_n=pubkeys_info["quorum_n"],
             limit=LIMIT,
             offset=OFFSET,
-            is_testnet=pubkeys_info['is_testnet'],
+            is_testnet=pubkeys_info["is_testnet"],
         )
         gen = information(**var)
         self.do_update(gen, var)
-
 
 
 class SpendFrame(tk.Frame):
