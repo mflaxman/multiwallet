@@ -10,13 +10,14 @@ date
 set -e;
 
 # Remove old files
-rm -rfv .venv3/
-rm -rfv dist/
-rm -rfv build/
-rm -rfv multiwallet.egg-info/
+rm -rf .venv3/
+rm -rf dist/
+rm -rf build/
+rm -rf multiwallet.egg-info/
 find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 # Install virtualenv
+python3 --version
 python3 -m pip install virtualenv
 python3 -m virtualenv .venv3
 source .venv3/bin/activate
