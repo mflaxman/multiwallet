@@ -7,12 +7,13 @@ from multiwallet_gui.send import SendFrame
 
 import pkg_resources
 
+
 def _get_version():
 
     try:
-        return "v " + pkg_resources.get_distribution("multiwallet").version 
+        return "v " + pkg_resources.get_distribution("multiwallet").version
     except pkg_resources.DistributionNotFound:
-        return 'custom'
+        return "custom"
 
 
 class Multiwallet(tk.Frame):
