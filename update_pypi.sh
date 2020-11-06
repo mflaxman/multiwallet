@@ -24,9 +24,9 @@ python3 -m pip install --upgrade twine
 python3 -m twine upload dist/*
 
 # Cleanup
-rm -rf dist/
-rm -rf multiwallet.egg-info/
-rm -rf build/
+rm -rfv dist/
+rm -rfv multiwallet.egg-info/
+rm -rfv build/
 
 # Hackey timer
 date
