@@ -6,6 +6,7 @@ from multiwallet_gui.receive import ReceiveFrame
 from multiwallet_gui.send import SendFrame
 
 import pkg_resources
+import sys
 
 
 def _get_version():
@@ -18,7 +19,7 @@ def _get_version():
 
 class Multiwallet(tk.Frame):
     VERSION = _get_version()
-    TITLE = f"Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY ({VERSION})"
+    TITLE = f"Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY ({VERSION} - {sys.version})"
 
     def __init__(self):
         self.root = tk.Tk()
