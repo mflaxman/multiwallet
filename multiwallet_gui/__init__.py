@@ -1,1 +1,1 @@
-from multiwallet import *
+from multiwallet_gui import *

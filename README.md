@@ -8,3 +8,14 @@ $ multiwallet_gui
 ```
 
 Downloadable binary coming soon!
+
+TODO:
+* libsec
+* better form handling/validation
+* test/release on multiple OS
+* Make it look better
+* Add QR codes
+* Add webcam
+* Support arbitrary paths
+* Mainnet/testnet toggle
+* Dark mode

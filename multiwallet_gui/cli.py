@@ -1,4 +1,4 @@
-from main import Multiwallet
+from multiwallet_gui.app import Multiwallet
 
 
 def main():

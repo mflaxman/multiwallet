@@ -1,13 +1,23 @@
 from tkinter import ttk
 import tkinter as tk
 
-from seedpicker import SeedpickerFrame
-from receive import ReceiveFrame
-from send import SendFrame
+from multiwallet_gui.seedpicker import SeedpickerFrame
+from multiwallet_gui.receive import ReceiveFrame
+from multiwallet_gui.send import SendFrame
+
+import pkg_resources
+
+def _get_version():
+
+    try:
+        return "v " + pkg_resources.get_distribution("multiwallet").version 
+    except pkg_resources.DistributionNotFound:
+        return 'custom'
 
 
 class Multiwallet(tk.Frame):
-    TITLE = "Multiwallet - Stateless PSBT Multisig Wallet"
+    VERSION = _get_version()
+    TITLE = f"Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY ({VERSION})"
 
     def __init__(self):
         self.root = tk.Tk()
