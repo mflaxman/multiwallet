@@ -22,10 +22,10 @@ python3 -m pip install virtualenv
 python3 -m virtualenv .venv3
 source .venv3/bin/activate
 python3 setup.py install
-pip freeze
+python3 -m pip freeze
 
 # Install pyinstaller (TODO: install this at system level outside of venv?)
-pip install pyinstaller
+python3 -m pip install pyinstaller
 pyinstaller multiwallet_gui/app.py --clean --windowed --name=multiwallet
 
 # Create DMG
