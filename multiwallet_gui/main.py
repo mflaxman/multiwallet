@@ -1,9 +1,9 @@
 from tkinter import ttk
 import tkinter as tk
 
-from .seedpicker import SeedpickerFrame
-from .receive import ReceiveFrame
-from .send import SendFrame
+from seedpicker import SeedpickerFrame
+from receive import ReceiveFrame
+from send import SendFrame
 
 
 class Multiwallet(tk.Frame):

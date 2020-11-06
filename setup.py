@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="multiwallet",
-    version="0.0.2",
+    version="0.2.0",
     author="Example Author",
     author_email="author@example.com",
     description="Multisig bitcoin wallet",
