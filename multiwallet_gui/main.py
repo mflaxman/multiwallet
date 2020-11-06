@@ -1,9 +1,9 @@
 from tkinter import ttk
 import tkinter as tk
 
-from seedpicker import SeedpickerFrame
-from receive import ReceiveFrame
-from send import SendFrame
+from .seedpicker import SeedpickerFrame
+from .receive import ReceiveFrame
+from .send import SendFrame
 
 
 class Multiwallet(tk.Frame):
@@ -28,8 +28,3 @@ class Multiwallet(tk.Frame):
 
     def run(self):
         self.root.mainloop()
-
-
-if __name__ == "__main__":
-    app = Multiwallet()
-    app.run()
