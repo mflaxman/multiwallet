@@ -1,9 +1,4 @@
-from multiwallet_gui.app import Multiwallet
-
-
-def main():
-    app = Multiwallet()
-    app.run()
+from multiwallet_gui.app import main
 
 
 if __name__ == "__main__":

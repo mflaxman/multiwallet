@@ -39,3 +39,12 @@ class Multiwallet(tk.Frame):
 
     def run(self):
         self.root.mainloop()
+
+
+def main():
+    app = Multiwallet()
+    return app.run()
+
+
+if __name__ == "__main__":
+    main()
