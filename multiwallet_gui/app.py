@@ -29,8 +29,12 @@ class MultiwalletApp(QDialog):
         self.setLayout(vbox)
 
 
-if __name__ == "__main__":
+def main():
     app = QApplication(sys.argv)
     my_app = MultiwalletApp()
     my_app.show()
     app.exec()
+
+
+if __name__ == "__main__":
+    main()
