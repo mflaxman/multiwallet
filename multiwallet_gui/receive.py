@@ -1,3 +1,5 @@
+#! /usr/bin/env bash
+
 import re
 from PyQt5.QtWidgets import (
     QApplication,

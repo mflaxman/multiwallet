@@ -28,8 +28,8 @@ python3 -m virtualenv .venv3
 source .venv3/bin/activate
 # python3 -m pip uninstall pyinstaller -y
 python3 -m pip install -r requirements.txt
+python3 -m pip install --editable .
 python3 -m pip install pyinstaller
-python3 setup.py install
 python3 -m pip freeze
 
 # Compile MacOs app
