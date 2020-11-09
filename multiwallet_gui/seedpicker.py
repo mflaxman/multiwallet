@@ -139,7 +139,7 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
         self.pubResultsLabel.setText(
-            f"PUBLIC KEY INFO ({'testnet' if IS_TESTNET else 'mainnet'}) - for Specter-Desktop"
+            f"PUBLIC KEY INFO - {'testnet' if IS_TESTNET else 'mainnet'}"
         )
         self.pubResultsEdit.setHidden(False)
         self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))
