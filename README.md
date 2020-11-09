@@ -45,7 +45,7 @@ TODO:
 * reproducible build
 * Make it look better
 * Add QR codes
+* Mainnet/testnet toggle
 * Add webcam
 * Support arbitrary paths
-* Mainnet/testnet toggle
 * Dark mode
