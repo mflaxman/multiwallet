@@ -154,14 +154,14 @@ class ReceiveTab(QWidget):
             )
 
         self.addrResultsLabel.setText(
-            "Multisig Addresses (this is ~100x faster with libsec installed)"
+            f"Multisig Addresses ({pubkeys_info['quorum_m']}-of-{pubkeys_info['quorum_n']})\n(this is ~100x faster with libsec installed)"
         )
         self.addrResultsEdit.setHidden(False)
 
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
         # TODO: make configurable
         OFFSET = 0
-        LIMIT = 20
+        LIMIT = 5
 
         # https://stackoverflow.com/questions/50104163/update-pyqt-gui-from-a-python-thread
         for index, address in get_addresses(

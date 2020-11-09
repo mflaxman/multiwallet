@@ -44,56 +44,54 @@ class SendTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        # Better way to store these between steps?
-        self.psb_obj = None
-        self.tx_desc = [], []
-
         self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (PSBT) in Base64")
         # FIXME: pre-seeding for easier testing, get rid of this
         self.psbtEdit = QPlainTextEdit(TEST_PSBT)
         self.psbtEdit.setPlaceholderText("deadbeef")
 
-        self.psbtSubmitButton = QPushButton("Decode Transaction")
-        self.psbtSubmitButton.clicked.connect(self.process_psbt)
+        self.fullSeedLabel = QLabel("Enter Your Full 24-Word Seed (to sign)")
+        # FIXME: pre-seeding for easier testing, get rid of this
+        self.fullSeedEdit = QPlainTextEdit(
+            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo abstract"
+        )
+        self.fullSeedEdit.setPlaceholderText(
+            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
+        )        
 
         self.psbtDecodedLabel = QLabel("")
         self.psbtDecodedEdit = QPlainTextEdit("")
         self.psbtDecodedEdit.setReadOnly(True)
         self.psbtDecodedEdit.setHidden(True)
 
-        self.fullSeedLabel = QLabel("")
-        self.fullSeedEdit = QPlainTextEdit("")
-        self.fullSeedEdit.setPlaceholderText("")
-        self.fullSeedEdit.setHidden(True)
+        self.psbtSubmitButton = QPushButton("Decode Transaction")
+        self.psbtSubmitButton.clicked.connect(self.decode_psbt)
 
         self.fullSeedSubmitButton = QPushButton("Sign Transaction")
-        self.fullSeedSubmitButton.clicked.connect(self.process_signature)
+        self.fullSeedSubmitButton.clicked.connect(self.sign_psbt)
 
         self.psbtSignedLabel = QLabel("")
         self.psbtSignedEdit = QPlainTextEdit("")
         self.psbtSignedEdit.setReadOnly(True)
         self.psbtSignedEdit.setHidden(True)
 
-        # Step 1
         vbox.addWidget(self.psbtLabel)
         vbox.addWidget(self.psbtEdit)
         vbox.addWidget(self.psbtSubmitButton)
-
-        # Step 2
-        vbox.addWidget(self.psbtDecodedLabel)
-        vbox.addWidget(self.psbtDecodedEdit)
         vbox.addWidget(self.fullSeedLabel)
         vbox.addWidget(self.fullSeedEdit)
         vbox.addWidget(self.fullSeedSubmitButton)
+        vbox.addWidget(self.psbtDecodedLabel)
+        vbox.addWidget(self.psbtDecodedEdit)
         vbox.addWidget(self.psbtSignedLabel)
         vbox.addWidget(self.psbtSignedEdit)
 
         self.setLayout(vbox)
 
-    def process_psbt(self):
+    def decode_psbt(self):
+        return self.sign_psbt(sign_tx=False)
+
+    def sign_psbt(self, sign_tx=True):
         # Clear any previous submission in case of errors
-        self.psbt_obj = None
-        self.tx_desc = [], []
         self.psbtDecodedLabel.setText("")
         self.psbtDecodedEdit.clear()
         self.psbtDecodedEdit.setHidden(True)
@@ -101,14 +99,14 @@ class SendTab(QWidget):
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
         try:
-            self.psbt_obj = PSBT.parse_base64(b64=psbt_str, testnet=self.IS_TESTNET)
+            psbt_obj = PSBT.parse_base64(b64=psbt_str, testnet=self.IS_TESTNET)
         except Exception as e:
             return _msgbox_err(
                 main_text="PSBT Parse Error",
                 informative_text="Are you sure that's a PSBT?",
                 detailed_text=str(e),
             )
-        TX_FEE_SATS = self.psbt_obj.tx_obj.fee()
+        TX_FEE_SATS = psbt_obj.tx_obj.fee()
 
         # Validate multisig transaction
         # TODO: abstract some of this into buidl library?
@@ -121,7 +119,7 @@ class SendTab(QWidget):
 
         # Gather TX info and validate
         inputs_desc = []
-        for cnt, psbt_in in enumerate(self.psbt_obj.psbt_ins):
+        for cnt, psbt_in in enumerate(psbt_obj.psbt_ins):
             psbt_in.validate()  # redundant but explicit
 
             if type(psbt_in.witness_script) != WitnessScript:
@@ -176,16 +174,16 @@ class SendTab(QWidget):
         TOTAL_INPUT_SATS = sum([x["sats"] for x in inputs_desc])
 
         # This too only supports TXs with 1-2 outputs (sweep TX OR spend+change TX):
-        if len(self.psbt_obj.psbt_outs) > 2:
+        if len(psbt_obj.psbt_outs) > 2:
             return _msgbox_err(
                 main_text="Too Many Outputs",
-                informative_text=f"Multiwallet does not support batching, and your transaction has {len(self.psbt_obj.psbt_outs)} outputs.",
+                informative_text=f"Multiwallet does not support batching, and your transaction has {len(psbt_obj.psbt_outs)} outputs.",
                 detailed_text="Please construct a transaction with <= 2 outputs.",
             )
 
         spend_addr, output_spend_sats = "", 0
         outputs_desc = []
-        for cnt, psbt_out in enumerate(self.psbt_obj.psbt_outs):
+        for cnt, psbt_out in enumerate(psbt_obj.psbt_outs):
             psbt_out.validate()  # redundant but explicit
 
             output_desc = {
@@ -243,10 +241,10 @@ class SendTab(QWidget):
             outputs_desc.append(output_desc)
 
         # Sanity check
-        if len(outputs_desc) != len(self.psbt_obj.psbt_outs):
+        if len(outputs_desc) != len(psbt_obj.psbt_outs):
             return _msgbox_err(
                 main_text="PSBT Parse Error",
-                informative_text=f"{len(outputs_desc)} outputs in TX summary doesn't match {len(self.psbt_obj.psbt_outs)} outputs in PSBT."
+                informative_text=f"{len(outputs_desc)} outputs in TX summary doesn't match {len(psbt_obj.psbt_outs)} outputs in PSBT."
             )
 
         # Confirm if 2 outputs we only have 1 change and 1 spend (can't be 2 changes or 2 spends)
@@ -260,8 +258,6 @@ class SendTab(QWidget):
                     detailed_text=f"For developers: {outputs_desc}",
                 )
 
-        self.tx_desc = inputs_desc, outputs_desc
-
         TX_SUMMARY = " ".join(
             [
                 "PSBT sends",
@@ -273,26 +269,14 @@ class SendTab(QWidget):
                 f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
-        self.psbtDecodedLabel.setText("Transaction Summary")
+        self.psbtDecodedLabel.setText("Decoded Transaction Summary")
         self.psbtDecodedEdit.setHidden(False)
         self.psbtDecodedEdit.appendPlainText(TX_SUMMARY)
-
-        self.fullSeedLabel.setText("Enter Your Full 24-Word Seed")
-        self.fullSeedLabel.setHidden(False)
-
-        # FIXME: pre-seeding for easier testing, get rid of this
-        self.fullSeedEdit = QPlainTextEdit(
-            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo abstract"
-        )
-        self.fullSeedEdit.setPlaceholderText(
-            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
-        )        
-        self.fullSeedEdit.setHidden(False)
 
         # TODO: surface this to user somehow
         to_print = []
         to_print.append("DETAILED VIEW")
-        to_print.append(f"TXID: {self.psbt_obj.tx_obj.id()}")
+        to_print.append(f"TXID: {psbt_obj.tx_obj.id()}")
         to_print.append("-" * 80)
         to_print.append(f"{len(inputs_desc)} Input(s):")
         for cnt, input_desc in enumerate(inputs_desc):
@@ -307,15 +291,15 @@ class SendTab(QWidget):
                 to_print.append(f"    {k}: {output_desc[k]}")
         print("\n".join(to_print))
 
-    def process_signature(self):
-        # FIXME: make it so that if you edit the PSBT (without submitting) this auto-wipes 
-        inputs_desc, outputs_desc = self.tx_desc
-
-        self.psbtSignedLabel.setText("")
-        self.psbtSignedEdit.clear()
-        self.psbtSignedEdit.setHidden(True)
-
         seed_phrase = _clean_submisission(self.fullSeedEdit.toPlainText())
+
+        if not sign_tx or not seed_phrase:
+            # Assume someone who hit sign but left the seed phrase blank just wants to decode
+            self.psbtSignedLabel.setText("")
+            self.psbtSignedEdit.clear()
+            self.psbtSignedEdit.setHidden(True)
+            return
+
         seed_phrase_num = len(seed_phrase.split())
         if seed_phrase_num not in (12, 15, 18, 21, 24):
             return _msgbox_err(
@@ -334,7 +318,7 @@ class SendTab(QWidget):
 
         # Derive list of child private keys we'll use to sign the TX
         root_paths = set()
-        for cnt, psbt_in in enumerate(self.psbt_obj.psbt_ins):
+        for cnt, psbt_in in enumerate(psbt_obj.psbt_ins):
             # Redundant safety check:
             if inputs_desc[cnt]["prev_txhash"] != psbt_in.tx_in.prev_tx.hex() or inputs_desc[cnt]["prev_idx"] != psbt_in.tx_in.prev_index:
                 return _msgbox_err(
@@ -358,10 +342,10 @@ class SendTab(QWidget):
         ]
 
         try:
-            if self.psbt_obj.sign_with_private_keys(private_keys) is True:
-                # FIXME:
-                print("Signed PSBT to broadcast:\n")
-                print(self.psbt_obj.serialize_base64())
+            if psbt_obj.sign_with_private_keys(private_keys) is True:
+                self.psbtSignedLabel.setText("Signed PSBT to Broadcast")
+                self.psbtSignedEdit.setHidden(False)
+                self.psbtSignedEdit.appendPlainText(psbt_obj.serialize_base64())
             else:
                 return _msgbox_err(
                     main_text="Transaction Not Signed",
