@@ -100,7 +100,7 @@ def get_addresses(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
         yield index, address
 
 
-TEST_PSBT = """
+TEST_DESCRIPTOR = """
 { "label": "Any Recovery", "blockheight": 1863986, "descriptor": "wsh(sortedmulti(1,[c7d0648a\/48h\/1h\/0h\/2h]tpubDEpefcgzY6ZyEV2uF4xcW2z8bZ3DNeWx9h2BcwcX973BHrmkQxJhpAXoSWZeHkmkiTtnUjfERsTDTVCcifW6po3PFR1JRjUUTJHvPpDqJhr\/0\/*,[12980eed\/48h\/1h\/0h\/2h]tpubDEkXGoQhYLFnYyzUGadtceUKbzVfXVorJEdo7c6VKJLHrULhpSVLC7fo89DDhjHmPvvNyrun2LTWH6FYmHh5VaQYPLEqLviVQKh45ufz8Ae\/0\/*,[3a52b5cd\/48h\/1h\/0h\/2h]tpubDFdbVee2Zna6eL9TkYBZDJVJ3RxGYWgChksXBRgw6y6PU1jWPTXUqag3CBMd6VDwok1hn5HZGvg6ujsTLXykrS3DwbxqCzEvWoT49gRJy7s\/0\/*,[f7d04090\/48h\/1h\/0h\/2h]tpubDF7FTuPECTePubPXNK73TYCzV3nRWaJnRwTXD28kh6Fz4LcaRzWwNtX153J7WeJFcQB2T6k9THd424Kmjs8Ps1FC1Xb81TXTxxbGZrLqQNp\/0\/*))#tatkmj5q" } 
 """.strip()  # noqa: W605, W291
 
@@ -114,7 +114,7 @@ class ReceiveTab(QWidget):
 
         self.descriptorLabel = QLabel("Desciptor")
         # FIXME: pre-seeding for easier testing, get rid of this
-        self.descriptorEdit = QPlainTextEdit(TEST_PSBT)
+        self.descriptorEdit = QPlainTextEdit(TEST_DESCRIPTOR)
         self.descriptorEdit.setPlaceholderText("wsh(sortedmulti(2,...))#...")
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
