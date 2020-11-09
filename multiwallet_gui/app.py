@@ -1,93 +1,78 @@
-#!/usr/bin/env python
-
-from PyQt5.QtCore import QFileInfo
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import (
     QApplication,
-    QCheckBox,
     QDialog,
-    QDialogButtonBox,
-    QFrame,
-    QGroupBox,
-    QLabel,
-    QLineEdit,
-    QListWidget,
     QTabWidget,
+    QComboBox,
+    QCheckBox,
+    QGroupBox,
     QVBoxLayout,
     QWidget,
+    QLabel,
+    QLineEdit,
+    QDialogButtonBox,
 )
+from PyQt5.QtGui import QIcon
+
+import sys
 
 
-class TabDialog(QDialog):
-    def __init__(self, fileName, parent=None):
-        super(TabDialog, self).__init__(parent)
-
-        fileInfo = QFileInfo(fileName)
-
-        tabWidget = QTabWidget()
-        tabWidget.addTab(SeedpickerTab(fileInfo), "Seedpicker")
-        tabWidget.addTab(ReceiveTab(fileInfo), "Receive")
-        tabWidget.addTab(SendTab(fileInfo), "Send")
-
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(tabWidget)
-        self.setLayout(mainLayout)
-
+class MultiwalletApp(QDialog):
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("Multiwallet - Stateless PSBT Multisig Wallet")
+
+        vbox = QVBoxLayout()
+        tabWidget = QTabWidget()
+
+        tabWidget.addTab(SeedpickerTab(), "Seedpicker")
+        tabWidget.addTab(ReceiveTab(), "Receive")
+        tabWidget.addTab(SendTab(), "Send")
+        vbox.addWidget(tabWidget)
+
+        self.setLayout(vbox)
 
 
 class SeedpickerTab(QWidget):
-    def __init__(self, fileInfo, parent=None):
-        super(SeedpickerTab, self).__init__(parent)
-
+    def __init__(self):
+        super().__init__()
         firstWordsLabel = QLabel("Seed Phrase:")
         firstWordsEdit = QLineEdit("zoo zoo zoo...")
 
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(firstWordsLabel)
-        mainLayout.addWidget(firstWordsEdit)
-        mainLayout.addStretch(1)
-        self.setLayout(mainLayout)
+        vbox = QVBoxLayout()
+        vbox.addWidget(firstWordsLabel)
+        vbox.addWidget(firstWordsEdit)
+        self.setLayout(vbox)
 
 
 class ReceiveTab(QWidget):
-    def __init__(self, fileInfo, parent=None):
+    def __init__(self, parent=None):
         super(ReceiveTab, self).__init__(parent)
 
         descriptorLabel = QLabel("Desciptor:")
         descriptorEdit = QLineEdit("...")
 
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(descriptorLabel)
-        mainLayout.addWidget(descriptorEdit)
-        mainLayout.addStretch(1)
-        self.setLayout(mainLayout)
+        vbox = QVBoxLayout()
+        vbox.addWidget(descriptorLabel)
+        vbox.addWidget(descriptorEdit)
+        self.setLayout(vbox)
 
 
 class SendTab(QWidget):
-    def __init__(self, fileInfo, parent=None):
+    def __init__(self, parent=None):
         super(SendTab, self).__init__(parent)
 
         psbtLabel = QLabel("PSBT To Sign:")
         psbtEdit = QLineEdit("...")
 
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(psbtLabel)
-        mainLayout.addWidget(psbtEdit)
-        mainLayout.addStretch(1)
-        self.setLayout(mainLayout)
+        vbox = QVBoxLayout()
+        vbox.addWidget(psbtLabel)
+        vbox.addWidget(psbtEdit)
+        self.setLayout(vbox)
 
 
 if __name__ == "__main__":
-
-    import sys
-
     app = QApplication(sys.argv)
-
-    if len(sys.argv) >= 2:
-        fileName = sys.argv[1]
-    else:
-        fileName = "."
-
-    tabdialog = TabDialog(fileName)
-    tabdialog.show()
-    sys.exit(app.exec_())
+    my_app = MultiwalletApp()
+    my_app.show()
+    app.exec()
