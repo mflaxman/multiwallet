@@ -3,13 +3,13 @@
 GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/1321503036724989952).
 
 #### Seedpicker
-![](seedpicker.png)
+![](images/seedpicker.png)
 
 #### Recieve
-![](receive.png)
+![](images/receive.png)
 
 #### Send
-![](send.png)
+![](images/send.png)
 
 ## Install
 
