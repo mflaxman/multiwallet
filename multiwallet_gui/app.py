@@ -13,10 +13,14 @@ from PyQt5.QtWidgets import (
     QPlainTextEdit,
     QPushButton,
     QDialogButtonBox,
+    QMessageBox,
 )
 from PyQt5.QtGui import QIcon
 
 import sys
+
+from buidl.hd import HDPrivateKey
+from buidl.mnemonic import WORD_LOOKUP, WORD_LIST
 
 
 def _clean_submisission(string):
@@ -52,7 +56,7 @@ class SeedpickerTab(QWidget):
         self.firstWordsEdit = QPlainTextEdit()
         self.firstWordsEdit.setPlaceholderText("zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo")
 
-        self.firstWordsSubmitButton = QPushButton("Default Push Button")
+        self.firstWordsSubmitButton = QPushButton("Calculate Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         vbox.addWidget(self.firstWordsLabel)
@@ -61,16 +65,46 @@ class SeedpickerTab(QWidget):
 
         self.setLayout(vbox)
 
+    def _error(self, main_text=None, informative_text=None, detailed_text=None):
+            msg = QMessageBox()
+            # msg.setWindowTitle("foo")  # TODO: this doesn't work
+            if main_text:
+                msg.setText(main_text)
+            msg.setIcon(QMessageBox.Critical)
+            if informative_text:
+                msg.setInformativeText(informative_text)
+
+            if detailed_text:
+                msg.setDetailedText(detailed_text)
+            msg.exec_()
+
+
     def process_submit(self):
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
         fw_num = len(first_words.split())
         if fw_num not in (11, 14, 17, 20, 23):
             # TODO: 11, 14, 17, or 20 word seed phrases also work but this is not documented as it's for advanced users
-            err = f"Enter 23 word seed-phrase (you entered {fw_num} words)"
-            print("err", err)
-            return
+            return self._error(
+                    main_text="Invalid seed phrase",
+                    informative_text="Seed phrase must be 23 words",
+                    detailed_text=f"you entered {fw_num} words",
+                    )
 
-        print("success", first_words)
+        wordlist_errors = []
+        for cnt, word in enumerate(first_words.split()):
+            if word not in WORD_LOOKUP:
+                wordlist_errors.append([cnt + 1, word])
+        if wordlist_errors:
+            # self.text.config(fg='red') (need a UI to turn this off on typing)
+            detailed_text = [
+                "The following are not valid:",
+            ]
+            detailed_text.extend([f"  word #{x[0]} {x[1]}" for x in wordlist_errors])
+            return self._error(
+                main_text="Non BIP39 words",
+                informative_text="Your seed phrase can ONLY contain BIP39 words",
+                detailed_text="\n".join(detailed_text),
+            )
 
 
 
