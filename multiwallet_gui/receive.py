@@ -18,6 +18,7 @@ from buidl.script import P2WSHScriptPubKey, WitnessScript
 
 # TODO: package with libsec
 
+
 def _re_pubkey_info_from_descriptor_fragment(fragment):
     xfp, path, xpub, idx = re.match(
         "\[([0-9a-f]+)\*?(.*?)\]([0-9A-Za-z]+).*([0-9]+?)",  # noqa: W605
@@ -144,15 +145,17 @@ class ReceiveTab(QWidget):
             pubkeys_info = _get_pubkeys_info_from_descriptor(desciptor_raw)
         except Exception as e:
             return _msgbox_err(
-                    main_text="Parse Error",
-                    informative_text=str(e),
-                )
+                main_text="Parse Error",
+                informative_text=str(e),
+            )
         if not pubkeys_info:
             return _msgbox_err(
                 main_text="Could not parse pubkeys from submission",
             )
 
-        self.addrResultsLabel.setText("Multisig Addresses (this is ~100x faster with libsec installed)")
+        self.addrResultsLabel.setText(
+            "Multisig Addresses (this is ~100x faster with libsec installed)"
+        )
         self.addrResultsEdit.setHidden(False)
 
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
@@ -170,7 +173,7 @@ class ReceiveTab(QWidget):
             is_testnet=pubkeys_info["is_testnet"],
         ):
             result = f"#{index}: {address}"
-            print('result', result)
+            print("result", result)
             self.addrResultsEdit.appendPlainText(result)
             QApplication.processEvents()  # needed to stream output (otherwise terrible UX)
-        print('done')
+        print("done")
