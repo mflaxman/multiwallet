@@ -20,13 +20,15 @@ Downloadable binary link here (MacOS only):
 #### Medium
 ```bash
 $ pip3 install multiwallet
-$ ./multiwallet_gui
+$ multiwallet_gui
 ```
 
 #### Advanced
 ```bash
 git clone https://github.com/mflaxman/multiwallet.git
 cd multiwallet
+python3 -m virtualenv .venv3
+source .venv3/bin/activate
 python3 setup.py develop
 python multiwallet_gui/app.py 
 ```
