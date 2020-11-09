@@ -89,13 +89,21 @@ class SeedpickerTab(QWidget):
         self.firstWordsSubmitButton = QPushButton("Calculate Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
+        self.resultsEdit = QPlainTextEdit("")
+        self.resultsEdit.setReadOnly(True)
+        self.resultsEdit.setHidden(True)
+
         vbox.addWidget(self.firstWordsLabel)
         vbox.addWidget(self.firstWordsEdit)
         vbox.addWidget(self.firstWordsSubmitButton)
+        vbox.addWidget(self.resultsEdit)
 
         self.setLayout(vbox)
 
     def process_submit(self):
+        # Clear any previous submission
+        # self.resultsEdit.setText("")  # FIXME
+
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
         fw_num = len(first_words.split())
         if fw_num not in (11, 14, 17, 20, 23):
@@ -158,6 +166,8 @@ class SeedpickerTab(QWidget):
             ),
         ]
         print("RESULT", "\n".join(to_display))
+        self.resultsEdit.setHidden(False)
+        self.resultsEdit.appendPlainText("\n".join(to_display))
 
 
 class ReceiveTab(QWidget):
