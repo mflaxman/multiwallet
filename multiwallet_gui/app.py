@@ -29,6 +29,7 @@ class MultiwalletApp(QDialog):
         vbox.addWidget(tabWidget)
 
         self.setLayout(vbox)
+        self.setFixedWidth(600)
 
 
 def main():

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-from multiwallet_gui.helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import _clean_submisission, _msgbox_err, _is_libsec_enabled
 
 from buidl.hd import HDPublicKey
 from buidl.helper import sha256
@@ -109,7 +109,7 @@ class ReceiveTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.descriptorLabel = QLabel("Wallet Descriptor")
+        self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
         self.descriptorEdit = QPlainTextEdit("")
         self.descriptorEdit.setPlaceholderText("wsh(sortedmulti(2,...")
 
@@ -154,10 +154,9 @@ class ReceiveTab(QWidget):
                 main_text="Could not parse pubkeys from submission",
             )
 
-        results_label = f"Multisig Addresses ({pubkeys_info['quorum_m']}-of-{pubkeys_info['quorum_n']})"
-        if True:
-            # TODO: add test for whether libsec is installed
-            results_label += "\nThis is ~100x faster with libsec installed"
+        results_label = f"<b>{pubkeys_info['quorum_m']}-of-{pubkeys_info['quorum_n']} Multisig Addresses</b>"
+        if not _is_libsec_enabled():
+            results_label += "\n(this is ~100x faster with libsec installed)"
 
         self.addrResultsLabel.setText(results_label)
         self.addrResultsEdit.setHidden(False)

@@ -18,3 +18,13 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
     if detailed_text:
         msg.setDetailedText(detailed_text)
     msg.exec_()
+
+
+def _is_libsec_enabled():
+    # TODO: move to buidl
+    try:
+        from buidl import cecc  # noqa: F401
+
+        return True
+    except ModuleNotFoundError:
+        return False

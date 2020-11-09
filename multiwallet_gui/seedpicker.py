@@ -13,12 +13,14 @@ from buidl.hd import HDPrivateKey
 from buidl.mnemonic import WORD_LOOKUP, WORD_LIST
 
 
-def _get_all_valid_checksum_words(first_words):
+def _get_all_valid_checksum_words(first_words, first_match=True):
     # TODO: move to buidl library
     to_return = []
     for word in WORD_LIST:
         try:
             HDPrivateKey.from_mnemonic(first_words + " " + word)
+            if first_match:
+                return [word], ""
             to_return.append(word)
         except KeyError as e:
             # We have a word in first_words that is not in WORD_LIST
@@ -36,7 +38,7 @@ class SeedpickerTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.firstWordsLabel = QLabel("Enter first 23 words of your seed:")
+        self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed</b>")
         self.firstWordsEdit = QPlainTextEdit("")
         self.firstWordsEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
@@ -94,7 +96,7 @@ class SeedpickerTab(QWidget):
                 informative_text="\n".join([f"Word #{x[0]}: {x[1]}" for x in wordlist_errors]),
             )
 
-        valid_checksum_words, err_str = _get_all_valid_checksum_words(first_words)
+        valid_checksum_words, err_str = _get_all_valid_checksum_words(first_words, first_match=True)
         if err_str:
 
             return _msgbox_err(
@@ -127,12 +129,12 @@ class SeedpickerTab(QWidget):
             ),
         ]
 
-        self.privResultsLabel.setText("SECRET INFO - guard this VERY carefully")
+        self.privResultsLabel.setText("<b>SECRET INFO</b> - guard this very carefully")
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
         self.pubResultsLabel.setText(
-            f"PUBLIC KEY INFO - {'testnet' if IS_TESTNET else 'mainnet'}"
+            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if IS_TESTNET else 'Mainnet'}"
         )
         self.pubResultsEdit.setHidden(False)
         self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))

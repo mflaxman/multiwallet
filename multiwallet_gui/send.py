@@ -42,11 +42,11 @@ class SendTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (required)")
+        self.psbtLabel = QLabel("<b>Partially Signed Bitcoin Transaction</b> (required)")
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 
-        self.fullSeedLabel = QLabel("Full 24-Word Seed Phrase")
+        self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b>")
         self.fullSeedEdit = QPlainTextEdit("")
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
@@ -275,7 +275,7 @@ class SendTab(QWidget):
                 f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
-        self.psbtDecodedLabel.setText("Decoded Transaction Summary")
+        self.psbtDecodedLabel.setText("<b>Decoded Transaction Summary</b>")
         self.psbtDecodedEdit.setHidden(False)
         self.psbtDecodedEdit.appendPlainText(TX_SUMMARY)
 
@@ -312,7 +312,7 @@ class SendTab(QWidget):
         if seed_phrase_num not in (12, 15, 18, 21, 24):
             return _msgbox_err(
                 main_text="Enter 24 word seed-phrase",
-                informative_text=f"You entered {seed_phrase_num} words)",
+                informative_text=f"You entered {seed_phrase_num} words",
             )
 
         try:
@@ -321,7 +321,7 @@ class SendTab(QWidget):
             return _msgbox_err(
                 main_text="Invalid BIP39 Seed Phrase",
                 informative_text="Transaction NOT signed",
-                detailed_view=str(e),
+                detailed_text=str(e),
             )
 
         # Derive list of child private keys we'll use to sign the TX
@@ -334,7 +334,7 @@ class SendTab(QWidget):
                 return _msgbox_err(
                     main_text="PSBT Parse Error",
                     informative_text="Transaction NOT signed",
-                    detailed_view=f"For developers: Input #{cnt} prev_txhash or prev_idx mismatch: \n{PSBT.serialize_base64()}",
+                    detailed_text=f"For developers: Input #{cnt} prev_txhash or prev_idx mismatch: \n{PSBT.serialize_base64()}",
                 )
 
             for _, details in psbt_in.named_pubs.items():
@@ -353,18 +353,18 @@ class SendTab(QWidget):
 
         try:
             if psbt_obj.sign_with_private_keys(private_keys) is True:
-                self.psbtSignedLabel.setText("Signed PSBT to Broadcast")
+                self.psbtSignedLabel.setText("<b>Signed PSBT to Broadcast</b>")
                 self.psbtSignedEdit.setHidden(False)
                 self.psbtSignedEdit.appendPlainText(psbt_obj.serialize_base64())
             else:
                 return _msgbox_err(
                     main_text="Transaction Not Signed",
                     informative_text="Couldn't find private key to sign with",
-                    detailed_view="This should've been checked earlier and should not be possible!",
+                    detailed_text="This should've been checked earlier and should not be possible!",
                 )
         except Exception as e:
             return _msgbox_err(
                 main_text="Transaction Not Signed",
                 informative_text="There was an error during signing.",
-                detailed_view=f"For developers: {e}",
+                detailed_text=f"For developers: {e}",
             )
