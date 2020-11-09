@@ -119,7 +119,7 @@ class ReceiveTab(QWidget):
         self.addrResultsLabel = QLabel("")
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
-        # self.addrResultsEdit.setHidden(True)
+        self.addrResultsEdit.setHidden(True)
 
         vbox.addWidget(self.descriptorLabel)
         vbox.addWidget(self.descriptorEdit)
