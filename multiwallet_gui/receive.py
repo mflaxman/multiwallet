@@ -100,7 +100,7 @@ def get_addresses(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
 
 TEST_PSBT = """
 { "label": "Any Recovery", "blockheight": 1863986, "descriptor": "wsh(sortedmulti(1,[c7d0648a\/48h\/1h\/0h\/2h]tpubDEpefcgzY6ZyEV2uF4xcW2z8bZ3DNeWx9h2BcwcX973BHrmkQxJhpAXoSWZeHkmkiTtnUjfERsTDTVCcifW6po3PFR1JRjUUTJHvPpDqJhr\/0\/*,[12980eed\/48h\/1h\/0h\/2h]tpubDEkXGoQhYLFnYyzUGadtceUKbzVfXVorJEdo7c6VKJLHrULhpSVLC7fo89DDhjHmPvvNyrun2LTWH6FYmHh5VaQYPLEqLviVQKh45ufz8Ae\/0\/*,[3a52b5cd\/48h\/1h\/0h\/2h]tpubDFdbVee2Zna6eL9TkYBZDJVJ3RxGYWgChksXBRgw6y6PU1jWPTXUqag3CBMd6VDwok1hn5HZGvg6ujsTLXykrS3DwbxqCzEvWoT49gRJy7s\/0\/*,[f7d04090\/48h\/1h\/0h\/2h]tpubDF7FTuPECTePubPXNK73TYCzV3nRWaJnRwTXD28kh6Fz4LcaRzWwNtX153J7WeJFcQB2T6k9THd424Kmjs8Ps1FC1Xb81TXTxxbGZrLqQNp\/0\/*))#tatkmj5q" } 
-""".strip()  # noqa: W605
+""".strip()  # noqa: W605, W291
 
 
 class ReceiveTab(QWidget):
@@ -118,7 +118,7 @@ class ReceiveTab(QWidget):
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
-        self.addrResultsLabel = QLabel("foo")
+        self.addrResultsLabel = QLabel("")
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
         self.addrResultsEdit.setHidden(True)
@@ -126,6 +126,8 @@ class ReceiveTab(QWidget):
         vbox.addWidget(self.descriptorLabel)
         vbox.addWidget(self.descriptorEdit)
         vbox.addWidget(self.descriptorSubmitButton)
+        vbox.addWidget(self.addrResultsLabel)
+        vbox.addWidget(self.addrResultsEdit)
 
         self.setLayout(vbox)
 
@@ -149,8 +151,10 @@ class ReceiveTab(QWidget):
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
         # TODO: make configurable
         OFFSET = 0
-        LIMIT = 10
+        LIMIT = 3
 
+        # https://stackoverflow.com/questions/50104163/update-pyqt-gui-from-a-python-thread
+        results = []
         for index, address in get_addresses(
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
@@ -159,5 +163,7 @@ class ReceiveTab(QWidget):
             offset=OFFSET,
             is_testnet=pubkeys_info["is_testnet"],
         ):
+            results.append(f"#{index}: {address}")
             print('addr', address)
-            self.addrResultsEdit.appendPlainText(f"#{index}: {address}")
+
+        self.addrResultsEdit.appendPlainText('\n'.join(results))
