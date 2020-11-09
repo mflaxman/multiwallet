@@ -8,6 +8,8 @@ set -o xtrace
 # Abandon if anything errors
 set -e;
 
+diskutil eject /Volumes/MultiWallet/ || echo "Drive already ejected"
+
 # Remove old files
 rm -rf .venv3/
 rm -rf dist/
