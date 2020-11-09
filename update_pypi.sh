@@ -3,11 +3,15 @@
 # Verbose printing
 set -o xtrace
 
-# Hackey timer
-date
-
 # Abandon if anything errors
 set -e;
+
+# Remove old files
+rm -rf .venv3/
+rm -rf dist/
+rm -rf build/
+rm -rf multiwallet.egg-info/
+find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 # Tests
 black --check .
@@ -29,4 +33,8 @@ rm -rfv multiwallet.egg-info/
 rm -rfv build/
 
 # Hackey timer
-date
+# https://askubuntu.com/questions/1028924/how-do-i-use-seconds-inside-a-bash-script
+hrs=$(( SECONDS/3600 ))
+mins=$(( (SECONDS-hrs*3600)/60))
+secs=$(( SECONDS-hrs*3600-mins*60 ))
+printf 'Time spent: %02d:%02d:%02d\n' $hrs $mins $secs
