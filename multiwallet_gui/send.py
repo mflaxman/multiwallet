@@ -102,7 +102,7 @@ class SendTab(QWidget):
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
 
-        if not psb_str:
+        if not psbt_str:
             return _msgbox_err(
                 main_text="No PSBT Supplied",
                 informative_text="Enter a PSBT to decode and/or sign.",
@@ -330,10 +330,9 @@ class SendTab(QWidget):
         root_paths = set()
         for cnt, psbt_in in enumerate(psbt_obj.psbt_ins):
             # Redundant safety check:
-            if (
-                inputs_desc[cnt]["prev_txhash"] != psbt_in.tx_in.prev_tx.hex()
-                or inputs_desc[cnt]["prev_idx"] != psbt_in.tx_in.prev_index
-            ):
+            bad_txhash = inputs_desc[cnt]["prev_txhash"] != psbt_in.tx_in.prev_tx.hex()
+            bad_idx = inputs_desc[cnt]["prev_idx"] != psbt_in.tx_in.prev_index
+            if bad_txhash or bad_idx:
                 return _msgbox_err(
                     main_text="PSBT Parse Error",
                     informative_text="Transaction NOT signed",
