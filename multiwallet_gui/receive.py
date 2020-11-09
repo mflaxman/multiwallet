@@ -1,4 +1,5 @@
 import re
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
@@ -103,12 +104,25 @@ TEST_PSBT = """
 """.strip()  # noqa: W605, W291
 
 
+
+
+
 class ReceiveTab(QWidget):
     TITLE = "Receive"
+
+    updateProgress = pyqtSignal(str)
+
+    def _return_addr(self, string):
+        print('called')
+        # self.addrResultsEdit.setHidden(False)
+        self.addrResultsEdit.appendPlainText(string)
+        self.addrResultsEdit.show()
 
     def __init__(self):
         super().__init__()
         vbox = QVBoxLayout()
+
+        self.updateProgress.connect(self._return_addr)
 
         self.descriptorLabel = QLabel("Desciptor")
         # FIXME: pre-seeding for easier testing, get rid of this
@@ -118,10 +132,10 @@ class ReceiveTab(QWidget):
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
-        self.addrResultsLabel = QLabel("")
+        self.addrResultsLabel = QLabel("Multisig Addresses")
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
-        self.addrResultsEdit.setHidden(True)
+        # self.addrResultsEdit.setHidden(True)
 
         vbox.addWidget(self.descriptorLabel)
         vbox.addWidget(self.descriptorEdit)
@@ -151,7 +165,7 @@ class ReceiveTab(QWidget):
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
         # TODO: make configurable
         OFFSET = 0
-        LIMIT = 3
+        LIMIT = 20
 
         # https://stackoverflow.com/questions/50104163/update-pyqt-gui-from-a-python-thread
         results = []
@@ -163,7 +177,7 @@ class ReceiveTab(QWidget):
             offset=OFFSET,
             is_testnet=pubkeys_info["is_testnet"],
         ):
-            results.append(f"#{index}: {address}")
-            print('addr', address)
-
-        self.addrResultsEdit.appendPlainText('\n'.join(results))
+            result = f"#{index}: {address}"
+            print('result', result)
+            self.updateProgress.emit(result)
+        print('done')
