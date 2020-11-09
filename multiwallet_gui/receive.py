@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-from helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import _clean_submisission, _msgbox_err
 
 from buidl.hd import HDPublicKey
 from buidl.helper import sha256

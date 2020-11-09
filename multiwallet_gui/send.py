@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-from helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import _clean_submisission, _msgbox_err
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,

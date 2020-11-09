@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import (
 
 import sys
 
-from seedpicker import SeedpickerTab
-from receive import ReceiveTab
-from send import SendTab
+from multiwallet_gui.seedpicker import SeedpickerTab
+from multiwallet_gui.receive import ReceiveTab
+from multiwallet_gui.send import SendTab
 
 
 class MultiwalletApp(QDialog):

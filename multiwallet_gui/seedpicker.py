@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-from helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import _clean_submisission, _msgbox_err
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
@@ -73,7 +73,7 @@ class SeedpickerTab(QWidget):
         self.pubResultsEdit.clear()
         self.pubResultsEdit.setHidden(True)
         self.pubResultsLabel.setText("")
-        # TODO: why setText and not hide? # FIXME
+        # TODO: why setText and not hide?
 
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
         fw_num = len(first_words.split())
@@ -89,15 +89,9 @@ class SeedpickerTab(QWidget):
             if word not in WORD_LOOKUP:
                 wordlist_errors.append([cnt + 1, word])
         if wordlist_errors:
-            # self.text.config(fg='red') (need a UI to turn this off on typing)
-            detailed_text = [
-                "The following are not valid:",
-            ]
-            detailed_text.extend([f"  word #{x[0]} {x[1]}" for x in wordlist_errors])
             return _msgbox_err(
-                main_text="Non BIP39 words",
-                informative_text="Your seed phrase can ONLY contain BIP39 words",
-                detailed_text="\n".join(detailed_text),
+                main_text="Invalid BIP39 Word(s)",
+                informative_text="\n".join([f"Word #{x[0]}: {x[1]}" for x in wordlist_errors]),
             )
 
         valid_checksum_words, err_str = _get_all_valid_checksum_words(first_words)

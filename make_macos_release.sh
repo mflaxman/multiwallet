@@ -27,13 +27,13 @@ python3 -m pip install virtualenv
 python3 -m virtualenv .venv3
 source .venv3/bin/activate
 # python3 -m pip uninstall pyinstaller -y
-python3 -m pip install -r requirements.txt
-python3 -m pip install --editable .
 python3 -m pip install pyinstaller
+python3 -m pip install -r requirements.txt
+python3 setup.py develop
 python3 -m pip freeze
 
 # Compile MacOs app
-pyinstaller multiwallet_gui/app.py --clean --windowed --name=multiwallet
+pyinstaller multiwallet_gui/app.py --clean --windowed --name=MultiWallet
 
 # Create DMG
 cd dist/
@@ -42,8 +42,8 @@ create-dmg \
   --window-size 800 400 \
   --icon-size 100 \
   --app-drop-link 600 185 \
-  multiwallet.dmg \
-  "multiwallet.app/"
+  MultiWallet.dmg \
+  "MultiWallet.app/"
 cd ..
 
 # Hackey timer
