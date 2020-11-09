@@ -10,11 +10,18 @@ from PyQt5.QtWidgets import (
     QWidget,
     QLabel,
     QLineEdit,
+    QPlainTextEdit,
+    QPushButton,
     QDialogButtonBox,
 )
 from PyQt5.QtGui import QIcon
 
 import sys
+
+
+def _clean_submisission(string):
+    # TODO: more advanced regex
+    return string.replace("  ", " ").strip()
 
 
 class MultiwalletApp(QDialog):
@@ -39,13 +46,32 @@ class SeedpickerTab(QWidget):
 
     def __init__(self):
         super().__init__()
-        firstWordsLabel = QLabel("Seed Phrase:")
-        firstWordsEdit = QLineEdit("zoo zoo zoo...")
-
         vbox = QVBoxLayout()
-        vbox.addWidget(firstWordsLabel)
-        vbox.addWidget(firstWordsEdit)
+
+        self.firstWordsLabel = QLabel("Enter first 23 words of your seed:")
+        self.firstWordsEdit = QPlainTextEdit()
+        self.firstWordsEdit.setPlaceholderText("zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo")
+
+        self.firstWordsSubmitButton = QPushButton("Default Push Button")
+        self.firstWordsSubmitButton.clicked.connect(self.process_submit)
+
+        vbox.addWidget(self.firstWordsLabel)
+        vbox.addWidget(self.firstWordsEdit)
+        vbox.addWidget(self.firstWordsSubmitButton)
+
         self.setLayout(vbox)
+
+    def process_submit(self):
+        first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
+        fw_num = len(first_words.split())
+        if fw_num not in (11, 14, 17, 20, 23):
+            # TODO: 11, 14, 17, or 20 word seed phrases also work but this is not documented as it's for advanced users
+            err = f"Enter 23 word seed-phrase (you entered {fw_num} words)"
+            print("err", err)
+            return
+
+        print("success", first_words)
+
 
 
 class ReceiveTab(QWidget):
