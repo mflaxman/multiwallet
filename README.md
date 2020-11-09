@@ -2,6 +2,11 @@
 
 GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/1321503036724989952).
 
+Seedpicker
+![](seedpicker.png)
+![](receive.png)
+![](send.png)
+
 ## Install
 
 #### Easy
@@ -11,15 +16,15 @@ Downloadable binary link here (MacOS only):
 #### Medium
 ```bash
 $ pip3 install multiwallet
-$ multiwallet_gui
+$ ./multiwallet_gui
 ```
 
 #### Advanced
 ```bash
 git clone https://github.com/mflaxman/multiwallet.git
 cd multiwallet
-python3 setup.py install
-./multiwallet_gui
+python3 setup.py develop
+python multiwallet_gui/app.py 
 ```
 
 ## Make a Release
