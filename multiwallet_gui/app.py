@@ -89,21 +89,35 @@ class SeedpickerTab(QWidget):
         self.firstWordsSubmitButton = QPushButton("Calculate Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
-        self.resultsEdit = QPlainTextEdit("")
-        self.resultsEdit.setReadOnly(True)
-        self.resultsEdit.setHidden(True)
+        self.privResultsLabel = QLabel("")
+        self.privResultsEdit = QPlainTextEdit("")
+        self.privResultsEdit.setReadOnly(True)
+        self.privResultsEdit.setHidden(True)
+
+        self.pubResultsLabel = QLabel("")
+        self.pubResultsEdit = QPlainTextEdit("")
+        self.pubResultsEdit.setReadOnly(True)
+        self.pubResultsEdit.setHidden(True)
 
         vbox.addWidget(self.firstWordsLabel)
         vbox.addWidget(self.firstWordsEdit)
         vbox.addWidget(self.firstWordsSubmitButton)
-        vbox.addWidget(self.resultsEdit)
+        vbox.addWidget(self.privResultsLabel)
+        vbox.addWidget(self.privResultsEdit)
+        vbox.addWidget(self.pubResultsLabel)
+        vbox.addWidget(self.pubResultsEdit)
 
         self.setLayout(vbox)
 
     def process_submit(self):
         # Clear any previous submission in case of errors
-        self.resultsEdit.clear()
-        self.resultsEdit.setHidden(True)
+        self.privResultsEdit.clear()
+        self.privResultsEdit.setHidden(True)
+        self.privResultsLabel.setText("")
+        self.pubResultsEdit.clear()
+        self.pubResultsEdit.setHidden(True)
+        self.pubResultsLabel.setText("")
+        # TODO: why setText and not hide? # FIXME
 
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
         fw_num = len(first_words.split())
@@ -150,15 +164,12 @@ class SeedpickerTab(QWidget):
         last_word = valid_checksum_words[0]
         hd_priv = HDPrivateKey.from_mnemonic(first_words + " " + last_word)
 
-        to_display = [
-            "SECRET INFO - guard this VERY carefully",
+        priv_to_display = [
             f"Last Word: {last_word}",
             f"Full {fw_num + 1} word mnemonic (including last word): {first_words + ' ' + last_word}",
-            "",
-            f"PUBLIC KEY INFO ({'testnet' if IS_TESTNET else 'mainnet'})",
-            "Copy-paste this into Specter-Desktop:",
-            "",
-            "  [{}{}]{}".format(
+        ]
+        pub_to_display = [
+            "[{}{}]{}".format(
                 hd_priv.fingerprint().hex(),
                 PATH.replace("m", "").replace("'", "h"),
                 hd_priv.traverse(PATH).xpub(
@@ -166,9 +177,14 @@ class SeedpickerTab(QWidget):
                 ),
             ),
         ]
-        print("RESULT", "\n".join(to_display))
-        self.resultsEdit.setHidden(False)
-        self.resultsEdit.appendPlainText("\n".join(to_display))
+
+        self.privResultsLabel.setText("SECRET INFO - guard this VERY carefully")
+        self.privResultsEdit.setHidden(False)
+        self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
+
+        self.pubResultsLabel.setText(f"PUBLIC KEY INFO ({'testnet' if IS_TESTNET else 'mainnet'}) - Copy-paste this into Specter-Desktop")
+        self.pubResultsEdit.setHidden(False)
+        self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))
 
 
 class ReceiveTab(QWidget):
