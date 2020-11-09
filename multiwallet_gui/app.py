@@ -28,14 +28,8 @@ class TabDialog(QDialog):
         tabWidget.addTab(ReceiveTab(fileInfo), "Receive")
         tabWidget.addTab(SendTab(fileInfo), "Send")
 
-        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-
-        buttonBox.accepted.connect(self.accept)
-        buttonBox.rejected.connect(self.reject)
-
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(tabWidget)
-        mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
 
         self.setWindowTitle("Multiwallet - Stateless PSBT Multisig Wallet")
