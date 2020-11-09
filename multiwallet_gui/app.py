@@ -3,14 +3,13 @@ from PyQt5.QtWidgets import (
     QDialog,
     QTabWidget,
     QVBoxLayout,
-    QWidget,
-    QLabel,
-    QLineEdit,
 )
 
 import sys
 
 from seedpicker import SeedpickerTab
+from receive import ReceiveTab
+from send import SendTab
 
 
 class MultiwalletApp(QDialog):
@@ -27,36 +26,6 @@ class MultiwalletApp(QDialog):
 
         vbox.addWidget(tabWidget)
 
-        self.setLayout(vbox)
-
-
-class ReceiveTab(QWidget):
-    TITLE = "Receive"
-
-    def __init__(self, parent=None):
-        super(ReceiveTab, self).__init__(parent)
-
-        descriptorLabel = QLabel("Desciptor:")
-        descriptorEdit = QLineEdit("...")
-
-        vbox = QVBoxLayout()
-        vbox.addWidget(descriptorLabel)
-        vbox.addWidget(descriptorEdit)
-        self.setLayout(vbox)
-
-
-class SendTab(QWidget):
-    TITLE = "Send"
-
-    def __init__(self, parent=None):
-        super(SendTab, self).__init__(parent)
-
-        psbtLabel = QLabel("PSBT To Sign:")
-        psbtEdit = QLineEdit("...")
-
-        vbox = QVBoxLayout()
-        vbox.addWidget(psbtLabel)
-        vbox.addWidget(psbtEdit)
         self.setLayout(vbox)
 
 
