@@ -43,7 +43,7 @@ class SeedpickerTab(QWidget):
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
-        self.firstWordsSubmitButton = QPushButton("Calculate Seed")
+        self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
@@ -81,9 +81,8 @@ class SeedpickerTab(QWidget):
         if fw_num not in (11, 14, 17, 20, 23):
             # TODO: 11, 14, 17, or 20 word seed phrases also work but this is not documented as it's for advanced users
             return _msgbox_err(
-                main_text="Invalid seed phrase",
-                informative_text="Seed phrase must be 23 words",
-                detailed_text=f"you entered {fw_num} words",
+                main_text="Seed Phrase Must Be 23 Words",
+                informative_text="you entered {fw_num} words",
             )
 
         wordlist_errors = []
