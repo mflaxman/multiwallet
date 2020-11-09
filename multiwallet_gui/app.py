@@ -25,15 +25,18 @@ class MultiwalletApp(QDialog):
         vbox = QVBoxLayout()
         tabWidget = QTabWidget()
 
-        tabWidget.addTab(SeedpickerTab(), "Seedpicker")
-        tabWidget.addTab(ReceiveTab(), "Receive")
-        tabWidget.addTab(SendTab(), "Send")
+        for tab in (SeedpickerTab, ReceiveTab, SendTab):
+            tab_obj= tab()
+            tabWidget.addTab(tab_obj, tab_obj.TITLE)
+
         vbox.addWidget(tabWidget)
 
         self.setLayout(vbox)
 
 
 class SeedpickerTab(QWidget):
+    TITLE = "Seedpicker"
+
     def __init__(self):
         super().__init__()
         firstWordsLabel = QLabel("Seed Phrase:")
@@ -46,6 +49,8 @@ class SeedpickerTab(QWidget):
 
 
 class ReceiveTab(QWidget):
+    TITLE = "Receive"
+    
     def __init__(self, parent=None):
         super(ReceiveTab, self).__init__(parent)
 
@@ -59,6 +64,8 @@ class ReceiveTab(QWidget):
 
 
 class SendTab(QWidget):
+    TITLE = "Send"
+
     def __init__(self, parent=None):
         super(SendTab, self).__init__(parent)
 
