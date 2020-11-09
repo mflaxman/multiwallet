@@ -15,6 +15,9 @@ rm -rf build/
 rm -rf multiwallet.egg-info/
 find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
+black --check .
+flake8 .
+
 # Python stuff
 python3 --version
 # Install virtualenv (if not installed)
