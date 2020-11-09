@@ -42,11 +42,11 @@ class SendTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (PSBT) in Base64")
+        self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (required)")
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 
-        self.fullSeedLabel = QLabel("Enter Your Full 24-Word Seed (to sign)")
+        self.fullSeedLabel = QLabel("Full 24-Word Seed Phrase")
         self.fullSeedEdit = QPlainTextEdit("")
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
