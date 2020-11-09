@@ -101,6 +101,13 @@ class SendTab(QWidget):
         # TODO: why setText and not hide? # FIXME
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
+
+        if not psb_str:
+            return _msgbox_err(
+                main_text="No PSBT Supplied",
+                informative_text="Enter a PSBT to decode and/or sign.",
+            )
+
         try:
             psbt_obj = PSBT.parse_base64(b64=psbt_str, testnet=self.IS_TESTNET)
         except Exception as e:

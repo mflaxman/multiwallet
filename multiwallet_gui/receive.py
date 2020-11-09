@@ -87,7 +87,7 @@ def _get_address(pubkey_dicts, quorum_m, quorum_n, index, is_testnet):
 
 
 def get_addresses(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
-    # Create generator obj
+    # Use generator for iterative display
     for cnt in range(limit):
         index = cnt + offset
         address = _get_address(
@@ -107,7 +107,7 @@ class ReceiveTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.descriptorLabel = QLabel("Descriptor")
+        self.descriptorLabel = QLabel("Wallet Descriptor")
         self.descriptorEdit = QPlainTextEdit("")
         self.descriptorEdit.setPlaceholderText("wsh(sortedmulti(2,...")
 
@@ -135,6 +135,11 @@ class ReceiveTab(QWidget):
         # TODO: why setText and not hide? # FIXME
 
         desciptor_raw = _clean_submisission(self.descriptorEdit.toPlainText())
+        if not desciptor_raw:
+            return _msgbox_err(
+                main_text="No Wallet Desciptor",
+                informative_text="Enter a wallet descriptor to derive your bitcoin addresses.",
+            )
         try:
             pubkeys_info = _get_pubkeys_info_from_descriptor(desciptor_raw)
         except Exception as e:
