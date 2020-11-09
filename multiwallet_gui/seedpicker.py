@@ -35,10 +35,7 @@ class SeedpickerTab(QWidget):
         vbox = QVBoxLayout()
 
         self.firstWordsLabel = QLabel("Enter first 23 words of your seed:")
-        # FIXME: pre-seeding for easier testing, get rid of this
-        self.firstWordsEdit = QPlainTextEdit(
-            "air air air air air air air air air air air air air air air air air air air air air air air"
-        )
+        self.firstWordsEdit = QPlainTextEdit("")
         self.firstWordsEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
@@ -82,7 +79,7 @@ class SeedpickerTab(QWidget):
             # TODO: 11, 14, 17, or 20 word seed phrases also work but this is not documented as it's for advanced users
             return _msgbox_err(
                 main_text="Seed Phrase Must Be 23 Words",
-                informative_text="you entered {fw_num} words",
+                informative_text=f"you entered {fw_num} words",
             )
 
         wordlist_errors = []

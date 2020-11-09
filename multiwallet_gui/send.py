@@ -29,10 +29,6 @@ def _format_satoshis(sats, in_btc=False):
     return f"{sats:,} sats"
 
 
-TEST_PSBT = """
-cHNidP8BAH0CAAAAAfsWeOlaFJKfqlQHzx+WgjRJlEB9XLzMCXchCw4si7PDAQAAAAD/////AoUIAAAAAAAAIgAgxb6HvJsx6G8mjBf/ERAtVkJHNNu5n0t6JaZr54V3Og7WHQAAAAAAABYAFMINV2dNtzP+jUjqf2bIwsPrqp+7AAAAAAABASsQJwAAAAAAACIAIDuuQfOewCl82IjzKJAjQy5pUQKaE7HBtEJA5pYh/y54AQWLUSECOLBbCCUjX61VtXIa9P1ZPhpsz0okfHLI8lQM/2dlnQshA1gkYwW4I1IawxzVo8L53yV1y/R7Jq3aeypId5KPdevNIQOv86ZXTRchmJ8w5IXJ9Vx18yQxUytq3xkZdCBKn4vTgiEDsT5favW6RBtmK7GQJ3HBl3p4AXDoJU6HAYrl9XXna/1UriIGAjiwWwglI1+tVbVyGvT9WT4abM9KJHxyyPJUDP9nZZ0LHBKYDu0wAACAAQAAgAAAAIACAACAAAAAAAcAAAAiBgNYJGMFuCNSGsMc1aPC+d8ldcv0eyat2nsqSHeSj3XrzRz30ECQMAAAgAEAAIAAAACAAgAAgAAAAAAHAAAAIgYDr/OmV00XIZifMOSFyfVcdfMkMVMrat8ZGXQgSp+L04Icx9BkijAAAIABAACAAAAAgAIAAIAAAAAABwAAACIGA7E+X2r1ukQbZiuxkCdxwZd6eAFw6CVOhwGK5fV152v9HDpStc0wAACAAQAAgAAAAIACAACAAAAAAAcAAAAAAQGLUSECPVlulR9WOiDFRX7p3cyIGDbmMn0qBJA0WHIRc6PWFlwhAskkzwGB+E7aT3ibDWIVgqmC1VprCHUq4OMVlzKJTZAdIQLfBhkEe8XmHQSm0vTSu2XZEQu58w9z4cBm7pzF5HC0gCED00gxYCXN/UhH6szbR+Ydq5+gxZN45Am/ruggbkUuSLRUriICAj1ZbpUfVjogxUV+6d3MiBg25jJ9KgSQNFhyEXOj1hZcHPfQQJAwAACAAQAAgAAAAIACAACAAQAAAAIAAAAiAgLJJM8BgfhO2k94mw1iFYKpgtVaawh1KuDjFZcyiU2QHRw6UrXNMAAAgAEAAIAAAACAAgAAgAEAAAACAAAAIgIC3wYZBHvF5h0EptL00rtl2RELufMPc+HAZu6cxeRwtIAcEpgO7TAAAIABAACAAAAAgAIAAIABAAAAAgAAACICA9NIMWAlzf1IR+rM20fmHaufoMWTeOQJv67oIG5FLki0HMfQZIowAACAAQAAgAAAAIACAACAAQAAAAIAAAAAAA==
-""".strip()  # noqa: W605, 291
-
 class SendTab(QWidget):
     TITLE = "Send"
 
@@ -46,8 +42,8 @@ class SendTab(QWidget):
 
         self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (PSBT) in Base64")
         # FIXME: pre-seeding for easier testing, get rid of this
-        self.psbtEdit = QPlainTextEdit(TEST_PSBT)
-        self.psbtEdit.setPlaceholderText("deadbeef")
+        self.psbtEdit = QPlainTextEdit("")
+        self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 
         self.fullSeedLabel = QLabel("Enter Your Full 24-Word Seed (to sign)")
         # FIXME: pre-seeding for easier testing, get rid of this
@@ -88,13 +84,20 @@ class SendTab(QWidget):
         self.setLayout(vbox)
 
     def decode_psbt(self):
-        return self.sign_psbt(sign_tx=False)
+        return self.process_psbt(sign_tx=False)
 
-    def sign_psbt(self, sign_tx=True):
+    def sign_psbt(self):
+        return self.process_psbt(sign_tx=True)
+
+    def process_psbt(self, sign_tx=True):
         # Clear any previous submission in case of errors
         self.psbtDecodedLabel.setText("")
         self.psbtDecodedEdit.clear()
         self.psbtDecodedEdit.setHidden(True)
+
+        self.psbtSignedLabel.setText("")
+        self.psbtSignedEdit.clear()
+        self.psbtSignedEdit.setHidden(True)
         # TODO: why setText and not hide? # FIXME
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
@@ -293,12 +296,14 @@ class SendTab(QWidget):
 
         seed_phrase = _clean_submisission(self.fullSeedEdit.toPlainText())
 
-        if not sign_tx or not seed_phrase:
-            # Assume someone who hit sign but left the seed phrase blank just wants to decode
-            self.psbtSignedLabel.setText("")
-            self.psbtSignedEdit.clear()
-            self.psbtSignedEdit.setHidden(True)
+        if not sign_tx:
             return
+
+        if not seed_phrase:
+            return _msgbox_err(
+                main_text="No Seed Phrase Supplied",
+                informative_text="Cannot Sign Transaction Without Seed Phrase",
+            )
 
         seed_phrase_num = len(seed_phrase.split())
         if seed_phrase_num not in (12, 15, 18, 21, 24):
