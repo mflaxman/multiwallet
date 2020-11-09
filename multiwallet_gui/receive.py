@@ -119,7 +119,7 @@ class ReceiveTab(QWidget):
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
-        self.addrResultsLabel = QLabel("Multisig Addresses")
+        self.addrResultsLabel = QLabel("")
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
         # self.addrResultsEdit.setHidden(True)
@@ -140,13 +140,19 @@ class ReceiveTab(QWidget):
         # TODO: why setText and not hide? # FIXME
 
         desciptor_raw = _clean_submisission(self.descriptorEdit.toPlainText())
-        pubkeys_info = _get_pubkeys_info_from_descriptor(desciptor_raw)
+        try:
+            pubkeys_info = _get_pubkeys_info_from_descriptor(desciptor_raw)
+        except Exception as e:
+            return _msgbox_err(
+                    main_text="Parse Error",
+                    informative_text=str(e),
+                )
         if not pubkeys_info:
             return _msgbox_err(
                 main_text="Could not parse pubkeys from submission",
             )
 
-        self.addrResultsLabel.setText("Multisig Addresses")
+        self.addrResultsLabel.setText("Multisig Addresses (this is ~100x faster with libsec installed)")
         self.addrResultsEdit.setHidden(False)
 
         # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
@@ -166,7 +172,5 @@ class ReceiveTab(QWidget):
             result = f"#{index}: {address}"
             print('result', result)
             self.addrResultsEdit.appendPlainText(result)
-            self.addrResultsEdit.update()
-            QApplication.processEvents()
-            self.addrResultsEdit.show()
+            QApplication.processEvents()  # needed to stream output (otherwise terrible UX)
         print('done')
