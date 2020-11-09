@@ -101,8 +101,9 @@ class SeedpickerTab(QWidget):
         self.setLayout(vbox)
 
     def process_submit(self):
-        # Clear any previous submission
-        # self.resultsEdit.setText("")  # FIXME
+        # Clear any previous submission in case of errors
+        self.resultsEdit.clear()
+        self.resultsEdit.setHidden(True)
 
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
         fw_num = len(first_words.split())
