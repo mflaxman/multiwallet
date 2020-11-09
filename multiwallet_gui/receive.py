@@ -1,5 +1,4 @@
 import re
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (
     QApplication,
     QVBoxLayout,
@@ -105,27 +104,12 @@ TEST_PSBT = """
 """.strip()  # noqa: W605, W291
 
 
-
-
-
 class ReceiveTab(QWidget):
     TITLE = "Receive"
-
-    updateProgress = pyqtSignal(str)
-
-    def _return_addr(self, string):
-        print('called')
-        # self.addrResultsEdit.setHidden(False)
-        self.addrResultsEdit.appendPlainText(string)
-        self.addrResultsEdit.update()
-        QApplication.processEvents()
-        self.addrResultsEdit.show()
 
     def __init__(self):
         super().__init__()
         vbox = QVBoxLayout()
-
-        self.updateProgress.connect(self._return_addr)
 
         self.descriptorLabel = QLabel("Desciptor")
         # FIXME: pre-seeding for easier testing, get rid of this
@@ -148,7 +132,6 @@ class ReceiveTab(QWidget):
 
         self.setLayout(vbox)
 
-    @pyqtSlot()
     def process_submit(self):
         # Clear any previous submission in case of errors
         self.addrResultsEdit.clear()
@@ -172,7 +155,6 @@ class ReceiveTab(QWidget):
         LIMIT = 20
 
         # https://stackoverflow.com/questions/50104163/update-pyqt-gui-from-a-python-thread
-        results = []
         for index, address in get_addresses(
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
@@ -183,5 +165,8 @@ class ReceiveTab(QWidget):
         ):
             result = f"#{index}: {address}"
             print('result', result)
-            self.updateProgress.emit(result)
+            self.addrResultsEdit.appendPlainText(result)
+            self.addrResultsEdit.update()
+            QApplication.processEvents()
+            self.addrResultsEdit.show()
         print('done')
