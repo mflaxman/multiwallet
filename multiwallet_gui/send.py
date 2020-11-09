@@ -42,7 +42,9 @@ class SendTab(QWidget):
         super().__init__()
         vbox = QVBoxLayout()
 
-        self.psbtLabel = QLabel("<b>Partially Signed Bitcoin Transaction</b> (required)")
+        self.psbtLabel = QLabel(
+            "<b>Partially Signed Bitcoin Transaction</b> (required)"
+        )
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 

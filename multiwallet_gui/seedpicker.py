@@ -93,10 +93,14 @@ class SeedpickerTab(QWidget):
         if wordlist_errors:
             return _msgbox_err(
                 main_text="Invalid BIP39 Word(s)",
-                informative_text="\n".join([f"Word #{x[0]}: {x[1]}" for x in wordlist_errors]),
+                informative_text="\n".join(
+                    [f"Word #{x[0]}: {x[1]}" for x in wordlist_errors]
+                ),
             )
 
-        valid_checksum_words, err_str = _get_all_valid_checksum_words(first_words, first_match=True)
+        valid_checksum_words, err_str = _get_all_valid_checksum_words(
+            first_words, first_match=True
+        )
         if err_str:
 
             return _msgbox_err(
