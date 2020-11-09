@@ -33,7 +33,7 @@ class SendTab(QWidget):
     TITLE = "Send"
 
     # FIXME (add support and UX for this)
-    UNITS = 'sats'
+    UNITS = "sats"
     IS_TESTNET = True  # No way to reliably infer this from the PSBT unfortunately :(
 
     def __init__(self):
@@ -52,7 +52,7 @@ class SendTab(QWidget):
         )
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
-        )        
+        )
 
         self.psbtDecodedLabel = QLabel("")
         self.psbtDecodedEdit = QPlainTextEdit("")
@@ -235,9 +235,7 @@ class SendTab(QWidget):
                 output_msig_digest = _calculate_msig_digest(
                     quorum_m=quorum_m, root_xfp_hexes=root_xfp_hexes
                 )
-                if (
-                    output_msig_digest != inputs_desc[0]["msig_digest"]
-                ):
+                if output_msig_digest != inputs_desc[0]["msig_digest"]:
                     return _msgbox_err(
                         main_text="Invalid Change Detected",
                         informative_text=f"Output #{cnt} is claiming to be change but has different multisig wallet(s)! Do a sweep transaction (1-output) if you want this wallet to cosign.",
@@ -254,7 +252,7 @@ class SendTab(QWidget):
         if len(outputs_desc) != len(psbt_obj.psbt_outs):
             return _msgbox_err(
                 main_text="PSBT Parse Error",
-                informative_text=f"{len(outputs_desc)} outputs in TX summary doesn't match {len(psbt_obj.psbt_outs)} outputs in PSBT."
+                informative_text=f"{len(outputs_desc)} outputs in TX summary doesn't match {len(psbt_obj.psbt_outs)} outputs in PSBT.",
             )
 
         # Confirm if 2 outputs we only have 1 change and 1 spend (can't be 2 changes or 2 spends)
@@ -332,7 +330,10 @@ class SendTab(QWidget):
         root_paths = set()
         for cnt, psbt_in in enumerate(psbt_obj.psbt_ins):
             # Redundant safety check:
-            if inputs_desc[cnt]["prev_txhash"] != psbt_in.tx_in.prev_tx.hex() or inputs_desc[cnt]["prev_idx"] != psbt_in.tx_in.prev_index:
+            if (
+                inputs_desc[cnt]["prev_txhash"] != psbt_in.tx_in.prev_tx.hex()
+                or inputs_desc[cnt]["prev_idx"] != psbt_in.tx_in.prev_index
+            ):
                 return _msgbox_err(
                     main_text="PSBT Parse Error",
                     informative_text="Transaction NOT signed",

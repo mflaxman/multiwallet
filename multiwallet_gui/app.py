@@ -15,7 +15,9 @@ from send import SendTab
 class MultiwalletApp(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY")
+        self.setWindowTitle(
+            "Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY"
+        )
 
         vbox = QVBoxLayout()
         tabWidget = QTabWidget()
