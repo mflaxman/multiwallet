@@ -1,6 +1,7 @@
 import re
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (
+    QApplication,
     QVBoxLayout,
     QWidget,
     QLabel,
@@ -116,6 +117,8 @@ class ReceiveTab(QWidget):
         print('called')
         # self.addrResultsEdit.setHidden(False)
         self.addrResultsEdit.appendPlainText(string)
+        self.addrResultsEdit.update()
+        QApplication.processEvents()
         self.addrResultsEdit.show()
 
     def __init__(self):
@@ -145,6 +148,7 @@ class ReceiveTab(QWidget):
 
         self.setLayout(vbox)
 
+    @pyqtSlot()
     def process_submit(self):
         # Clear any previous submission in case of errors
         self.addrResultsEdit.clear()
