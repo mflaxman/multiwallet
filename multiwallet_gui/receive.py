@@ -134,7 +134,7 @@ class ReceiveTab(QWidget):
         self.addrResultsEdit.clear()
         self.addrResultsEdit.setHidden(True)
         self.addrResultsLabel.setText("")
-        # TODO: why setText and not hide? # FIXME
+        # TODO: why setText and not hide?
 
         desciptor_raw = _clean_submisission(self.descriptorEdit.toPlainText())
         if not desciptor_raw:

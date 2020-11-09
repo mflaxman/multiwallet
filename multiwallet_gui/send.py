@@ -43,15 +43,11 @@ class SendTab(QWidget):
         vbox = QVBoxLayout()
 
         self.psbtLabel = QLabel("Partially Signed Bitcoin Transaction (PSBT) in Base64")
-        # FIXME: pre-seeding for easier testing, get rid of this
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 
         self.fullSeedLabel = QLabel("Enter Your Full 24-Word Seed (to sign)")
-        # FIXME: pre-seeding for easier testing, get rid of this
-        self.fullSeedEdit = QPlainTextEdit(
-            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo abstract"
-        )
+        self.fullSeedEdit = QPlainTextEdit("")
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
@@ -100,7 +96,7 @@ class SendTab(QWidget):
         self.psbtSignedLabel.setText("")
         self.psbtSignedEdit.clear()
         self.psbtSignedEdit.setHidden(True)
-        # TODO: why setText and not hide? # FIXME
+        # TODO: why setText and not hide?
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
 
