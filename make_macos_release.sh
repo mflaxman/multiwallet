@@ -8,6 +8,7 @@ set -o xtrace
 # Abandon if anything errors
 set -e;
 
+# Eject drive at beginning (may cause issues at end)
 diskutil eject /Volumes/MultiWallet/ || echo "Drive already ejected"
 
 # Remove old files
