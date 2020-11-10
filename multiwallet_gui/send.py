@@ -282,7 +282,7 @@ class SendTab(QWidget):
 
         TX_SUMMARY = " ".join(
             [
-                inputs_desc[0]['quorum'],
+                inputs_desc[0]["quorum"],
                 "PSBT sends",
                 _format_satoshis(output_spend_sats, in_btc=self.UNITS == "btc"),
                 "to",
