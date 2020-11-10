@@ -47,7 +47,7 @@ class SendTab(QWidget):
             "<b>Partially Signed Bitcoin Transaction</b> (required)"
         )
         self.psbtLabel.setToolTip(
-            "Transaction that your online computer is asking you to sign, in base64 format."
+            "What your online computer is asking you to sign, in base64 format."
         )
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("Something like this:\n\ncHNidP8BAH0CAAAAA...")

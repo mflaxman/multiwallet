@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
 import re
+
 from PyQt5.QtWidgets import (
     QApplication,
     QVBoxLayout,
@@ -8,6 +9,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QPlainTextEdit,
     QPushButton,
+    QSpinBox,
 )
 
 from multiwallet_gui.helper import _clean_submisission, _msgbox_err, _is_libsec_enabled
@@ -112,12 +114,25 @@ class ReceiveTab(QWidget):
 
         self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
         self.descriptorLabel.setToolTip(
-            "This extended <i>public</i> key information is used to generate your bitcoin addresses."
+            "This extended <i>public</i> key information (from all your hardware wallets) is used to generate your bitcoin addresses."
+            "<br><br>From Specter-Desktop: Wallet > Settings > Export To Wallet Software > Export > Copy wallet data."
         )
         self.descriptorEdit = QPlainTextEdit("")
         self.descriptorEdit.setPlaceholderText(
             "Something like this:\n\nwsh(sortedmulti(2,[deadbeef/48h/1h/0h/2h]xpub.../0/*,"
         )
+
+        self.limit_label = QLabel("<b>Limit of Addresses to Derive</b>")
+        self.limit_label.setToolTip("Address derivation is slow.")
+        self.limit_box = QSpinBox()
+        self.limit_box.setValue(5)
+        self.limit_box.setRange(1, 10000)
+
+        self.offset_label = QLabel("<b>Offset of Addresses to Derive</b>")
+        self.offset_label.setToolTip("Advanced users only.")
+        self.offset_box = QSpinBox()
+        self.offset_box.setValue(0)
+        self.offset_box.setMinimum(0)
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
@@ -132,6 +147,10 @@ class ReceiveTab(QWidget):
 
         vbox.addWidget(self.descriptorLabel)
         vbox.addWidget(self.descriptorEdit)
+        vbox.addWidget(self.limit_label)
+        vbox.addWidget(self.limit_box)
+        vbox.addWidget(self.offset_label)
+        vbox.addWidget(self.offset_box)
         vbox.addWidget(self.descriptorSubmitButton)
         vbox.addWidget(self.addrResultsLabel)
         vbox.addWidget(self.addrResultsEdit)
@@ -170,18 +189,16 @@ class ReceiveTab(QWidget):
         self.addrResultsLabel.setText(results_label)
         self.addrResultsEdit.setHidden(False)
 
-        # https://stackoverflow.com/questions/44014108/pass-a-variable-between-two-scripts
-        # TODO: make configurable
-        OFFSET = 0
-        LIMIT = 5
+        limit = self.limit_box.value()
+        offset = self.offset_box.value()
 
         # https://stackoverflow.com/questions/50104163/update-pyqt-gui-from-a-python-thread
         for index, address in get_addresses(
             pubkey_dicts=pubkeys_info["pubkey_dicts"],
             quorum_m=pubkeys_info["quorum_m"],
             quorum_n=pubkeys_info["quorum_n"],
-            limit=LIMIT,
-            offset=OFFSET,
+            limit=limit,
+            offset=offset,
             is_testnet=pubkeys_info["is_testnet"],
         ):
             result = f"#{index}: {address}"

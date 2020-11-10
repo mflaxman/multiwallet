@@ -34,7 +34,6 @@ python multiwallet_gui/app.py
 ```
 
 ## Roadmap:
-* Allow user to select limit/offset for receive address verfication
 * Mainnet/testnet toggle
 * Add QR code generation on send/receive
 * Support arbitrary paths
