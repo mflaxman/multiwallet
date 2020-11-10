@@ -50,10 +50,10 @@ python multiwallet_gui/app.py
 
 Downloadable MacOS binary:
 ```
-$ time ./make_macos_release.sh 
+$ ./make_macos_release.sh 
 ```
 
 Update PyPI:
 ```
-$ time ./update_pypi.sh
+$ ./update_pypi.sh
 ```
