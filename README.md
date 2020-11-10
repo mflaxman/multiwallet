@@ -14,7 +14,7 @@ GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/13215030367
 ## Install
 
 #### Easy
-Downloadable binary link here (MacOS only): 
+Downloadable binary link here (MacOS only):  
 <https://github.com/mflaxman/multiwallet/releases>
 
 #### Medium
