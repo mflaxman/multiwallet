@@ -104,19 +104,22 @@ def get_addresses(pubkey_dicts, quorum_m, quorum_n, limit, offset, is_testnet):
 
 class ReceiveTab(QWidget):
     TITLE = "Receive"
+    HOVER = "Verify your bitcoin addresses belong to you qourum."
 
     def __init__(self):
         super().__init__()
         vbox = QVBoxLayout()
 
         self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
+        self.descriptorLabel.setToolTip("This extended <i>public</i> key information is used to generate your bitcoin addresses.")
         self.descriptorEdit = QPlainTextEdit("")
-        self.descriptorEdit.setPlaceholderText("wsh(sortedmulti(2,...")
+        self.descriptorEdit.setPlaceholderText("Something like this:\n\nwsh(sortedmulti(2,[deadbeef/48h/1h/0h/2h]xpub.../0/*,")
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
         self.addrResultsLabel = QLabel("")
+        self.addrResultsLabel.setToolTip("These bitcoin addresses belong to the quorum of extended public keys above. You may want to print this out for future reference.")
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
         self.addrResultsEdit.setHidden(True)
@@ -156,7 +159,7 @@ class ReceiveTab(QWidget):
 
         results_label = f"<b>{pubkeys_info['quorum_m']}-of-{pubkeys_info['quorum_n']} Multisig Addresses</b>"
         if not _is_libsec_enabled():
-            results_label += "\n(this is ~100x faster with libsec installed)"
+            results_label += "<br>(this is ~100x faster with libsec installed)"
 
         self.addrResultsLabel.setText(results_label)
         self.addrResultsEdit.setHidden(False)

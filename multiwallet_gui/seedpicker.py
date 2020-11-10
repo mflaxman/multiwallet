@@ -1,12 +1,18 @@
 #! /usr/bin/env bash
 
 from multiwallet_gui.helper import _clean_submisission, _msgbox_err
+
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (
+    qApp,
     QVBoxLayout,
-    QWidget,
+    QFrame,
     QLabel,
     QPlainTextEdit,
     QPushButton,
+    QStyle,
+    QToolTip,
+    QWidget,
 )
 
 from buidl.hd import HDPrivateKey
@@ -33,39 +39,51 @@ def _get_all_valid_checksum_words(first_words, first_match=True):
 
 class SeedpickerTab(QWidget):
     TITLE = "Seedpicker"
+    HOVER = (
+        "<b>Protect yourself against a bad random number generator.</b> "
+        "Pick 23 words of your seed phrase and Seedpicker will calculate the last word."
+    )
 
     def __init__(self):
         super().__init__()
-        vbox = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
         self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed</b>")
+        self.firstWordsLabel.setToolTip("Pull words out of a hat so you don't have to trust a random number generator.")
         self.firstWordsEdit = QPlainTextEdit("")
         self.firstWordsEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
+        # self.firstWordsSubmitButton = QPushButton(self)
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
+        self.firstWordsSubmitButton.setText("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
+        self.privResultsLabel.setToolTip("Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place. This represents your bitcoin <i>private</i> keys.")
         self.privResultsEdit = QPlainTextEdit("")
         self.privResultsEdit.setReadOnly(True)
         self.privResultsEdit.setHidden(True)
 
         self.pubResultsLabel = QLabel("")
+        self.privResultsLabel.setToolTip("For export to your transaction coordinator (Specter-Desktop). This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin.")
         self.pubResultsEdit = QPlainTextEdit("")
         self.pubResultsEdit.setReadOnly(True)
         self.pubResultsEdit.setHidden(True)
 
-        vbox.addWidget(self.firstWordsLabel)
-        vbox.addWidget(self.firstWordsEdit)
-        vbox.addWidget(self.firstWordsSubmitButton)
-        vbox.addWidget(self.privResultsLabel)
-        vbox.addWidget(self.privResultsEdit)
-        vbox.addWidget(self.pubResultsLabel)
-        vbox.addWidget(self.pubResultsEdit)
+        self.layout.addWidget(self.firstWordsLabel)
+        self.layout.addWidget(self.firstWordsEdit)
+        self.layout.addWidget(self.firstWordsSubmitButton)
+        self.layout.addWidget(self.privResultsLabel)
+        self.layout.addWidget(self.privResultsEdit)
+        self.layout.addWidget(self.pubResultsLabel)
+        self.layout.addWidget(self.pubResultsEdit)
 
-        self.setLayout(vbox)
+        self.setLayout(self.layout)
+
+        # show all the widgets 
+        self.show() 
 
     def process_submit(self):
         # Clear any previous submission in case of errors
