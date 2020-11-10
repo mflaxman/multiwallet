@@ -46,19 +46,25 @@ class SendTab(QWidget):
         self.psbtLabel = QLabel(
             "<b>Partially Signed Bitcoin Transaction</b> (required)"
         )
-        self.psbtLabel.setToolTip("Transaction your online computer is asking you to sign.")
+        self.psbtLabel.setToolTip(
+            "Transaction your online computer is asking you to sign."
+        )
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
 
         self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b> (optional)")
-        self.fullSeedLabel.setToolTip("Needed to sign the PSBT. You can first decode the transaction and inspect if before supplying your seed phrase.")
+        self.fullSeedLabel.setToolTip(
+            "Needed to sign the PSBT. You can first decode the transaction and inspect if before supplying your seed phrase."
+        )
         self.fullSeedEdit = QPlainTextEdit("")
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
         self.psbtDecodedLabel = QLabel("")
-        self.psbtDecodedLabel.setToolTip("The summary of what this transaction does. Multiwallet verifies all inputs belong to the same quorum and that any change is returned to the same quorum.")
+        self.psbtDecodedLabel.setToolTip(
+            "The summary of what this transaction does. Multiwallet verifies all inputs belong to the same quorum and that any change is returned to the same quorum."
+        )
 
         self.psbtDecodedEdit = QPlainTextEdit("")
         self.psbtDecodedEdit.setReadOnly(True)
@@ -71,7 +77,9 @@ class SendTab(QWidget):
         self.fullSeedSubmitButton.clicked.connect(self.sign_psbt)
 
         self.psbtSignedLabel = QLabel("")
-        self.psbtSignedLabel.setToolTip("Signed version for your online computer to broadcast to the bitcoin network (once it has collected sufficient signatures).")
+        self.psbtSignedLabel.setToolTip(
+            "Signed version for your online computer to broadcast to the bitcoin network (once it has collected sufficient signatures)."
+        )
         self.psbtSignedEdit = QPlainTextEdit("")
         self.psbtSignedEdit.setReadOnly(True)
         self.psbtSignedEdit.setHidden(True)

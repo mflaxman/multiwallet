@@ -2,16 +2,11 @@
 
 from multiwallet_gui.helper import _clean_submisission, _msgbox_err
 
-from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (
-    qApp,
     QVBoxLayout,
-    QFrame,
     QLabel,
     QPlainTextEdit,
     QPushButton,
-    QStyle,
-    QToolTip,
     QWidget,
 )
 
@@ -49,7 +44,9 @@ class SeedpickerTab(QWidget):
         self.layout = QVBoxLayout()
 
         self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed</b>")
-        self.firstWordsLabel.setToolTip("Pull words out of a hat so you don't have to trust a random number generator.")
+        self.firstWordsLabel.setToolTip(
+            "Pull words out of a hat so you don't have to trust a random number generator."
+        )
         self.firstWordsEdit = QPlainTextEdit("")
         self.firstWordsEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
@@ -61,13 +58,17 @@ class SeedpickerTab(QWidget):
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
-        self.privResultsLabel.setToolTip("Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place. This represents your bitcoin <i>private</i> keys.")
+        self.privResultsLabel.setToolTip(
+            "Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place. This represents your bitcoin <i>private</i> keys."
+        )
         self.privResultsEdit = QPlainTextEdit("")
         self.privResultsEdit.setReadOnly(True)
         self.privResultsEdit.setHidden(True)
 
         self.pubResultsLabel = QLabel("")
-        self.privResultsLabel.setToolTip("For export to your transaction coordinator (Specter-Desktop). This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin.")
+        self.privResultsLabel.setToolTip(
+            "For export to your transaction coordinator (Specter-Desktop). This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
+        )
         self.pubResultsEdit = QPlainTextEdit("")
         self.pubResultsEdit.setReadOnly(True)
         self.pubResultsEdit.setHidden(True)
@@ -82,8 +83,8 @@ class SeedpickerTab(QWidget):
 
         self.setLayout(self.layout)
 
-        # show all the widgets 
-        self.show() 
+        # show all the widgets  # TODO: needed?
+        self.show()
 
     def process_submit(self):
         # Clear any previous submission in case of errors

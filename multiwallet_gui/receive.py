@@ -111,15 +111,21 @@ class ReceiveTab(QWidget):
         vbox = QVBoxLayout()
 
         self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
-        self.descriptorLabel.setToolTip("This extended <i>public</i> key information is used to generate your bitcoin addresses.")
+        self.descriptorLabel.setToolTip(
+            "This extended <i>public</i> key information is used to generate your bitcoin addresses."
+        )
         self.descriptorEdit = QPlainTextEdit("")
-        self.descriptorEdit.setPlaceholderText("Something like this:\n\nwsh(sortedmulti(2,[deadbeef/48h/1h/0h/2h]xpub.../0/*,")
+        self.descriptorEdit.setPlaceholderText(
+            "Something like this:\n\nwsh(sortedmulti(2,[deadbeef/48h/1h/0h/2h]xpub.../0/*,"
+        )
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
         self.addrResultsLabel = QLabel("")
-        self.addrResultsLabel.setToolTip("These bitcoin addresses belong to the quorum of extended public keys above. You may want to print this out for future reference.")
+        self.addrResultsLabel.setToolTip(
+            "These bitcoin addresses belong to the quorum of extended public keys above. You may want to print this out for future reference."
+        )
         self.addrResultsEdit = QPlainTextEdit("")
         self.addrResultsEdit.setReadOnly(True)
         self.addrResultsEdit.setHidden(True)
