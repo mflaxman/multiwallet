@@ -11,7 +11,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="multiwallet",
-    version="0.3.2",
+    version="0.3.3",
     author="Michael Flaxman",
     author_email="multiwallet@michaelflaxman.com",
     description="Stateless multisig bitcoin wallet",

@@ -33,6 +33,7 @@ def _format_satoshis(sats, in_btc=False):
 
 class SendTab(QWidget):
     TITLE = "Send"
+    HOVER = "Use your seed to cosign a transaction."
 
     # FIXME (add support and UX for this)
     UNITS = "sats"
@@ -45,16 +46,26 @@ class SendTab(QWidget):
         self.psbtLabel = QLabel(
             "<b>Partially Signed Bitcoin Transaction</b> (required)"
         )
+        self.psbtLabel.setToolTip(
+            "Transaction that your online computer is asking you to sign, in base64 format."
+        )
         self.psbtEdit = QPlainTextEdit("")
-        self.psbtEdit.setPlaceholderText("cHNidP8BAH0CAAAAA...")
+        self.psbtEdit.setPlaceholderText("Something like this:\n\ncHNidP8BAH0CAAAAA...")
 
-        self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b>")
+        self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b> (optional)")
+        self.fullSeedLabel.setToolTip(
+            "Needed to sign the PSBT. You can first decode the transaction and inspect it without supplying your seed phrase."
+        )
         self.fullSeedEdit = QPlainTextEdit("")
         self.fullSeedEdit.setPlaceholderText(
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
         self.psbtDecodedLabel = QLabel("")
+        self.psbtDecodedLabel.setToolTip(
+            "The summary of what this transaction does. Multiwallet statelessly verifies all inputs belong to the same quorum and that any change is properly returned."
+        )
+
         self.psbtDecodedEdit = QPlainTextEdit("")
         self.psbtDecodedEdit.setReadOnly(True)
         self.psbtDecodedEdit.setHidden(True)
@@ -66,6 +77,9 @@ class SendTab(QWidget):
         self.fullSeedSubmitButton.clicked.connect(self.sign_psbt)
 
         self.psbtSignedLabel = QLabel("")
+        self.psbtSignedLabel.setToolTip(
+            "Signed version for your online computer to broadcast to the bitcoin network (once you have collected enough signatures)."
+        )
         self.psbtSignedEdit = QPlainTextEdit("")
         self.psbtSignedEdit.setReadOnly(True)
         self.psbtSignedEdit.setHidden(True)
@@ -268,6 +282,7 @@ class SendTab(QWidget):
 
         TX_SUMMARY = " ".join(
             [
+                inputs_desc[0]["quorum"],
                 "PSBT sends",
                 _format_satoshis(output_spend_sats, in_btc=self.UNITS == "btc"),
                 "to",
@@ -307,7 +322,7 @@ class SendTab(QWidget):
         if not seed_phrase:
             return _msgbox_err(
                 main_text="No Seed Phrase Supplied",
-                informative_text="Cannot Sign Transaction Without Seed Phrase",
+                informative_text="Cannot sign transaction without seed phrase",
             )
 
         seed_phrase_num = len(seed_phrase.split())

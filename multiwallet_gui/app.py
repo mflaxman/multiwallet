@@ -1,11 +1,14 @@
+#! /usr/bin/env bash
+
+import sys
+
 from PyQt5.QtWidgets import (
     QApplication,
     QDialog,
+    QDialogButtonBox,
     QTabWidget,
     QVBoxLayout,
 )
-
-import sys
 
 from multiwallet_gui.seedpicker import SeedpickerTab
 from multiwallet_gui.receive import ReceiveTab
@@ -18,25 +21,43 @@ class MultiwalletApp(QDialog):
         self.setWindowTitle(
             "Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY"
         )
+        self.setFixedWidth(800)
 
-        vbox = QVBoxLayout()
-        tabWidget = QTabWidget()
+        self.layout = QVBoxLayout()
 
-        for tab in (SeedpickerTab, ReceiveTab, SendTab):
-            tab_obj = tab()
-            tabWidget.addTab(tab_obj, tab_obj.TITLE)
+        self.tab_widget = QTabWidget()
 
-        vbox.addWidget(tabWidget)
+        if False:
+            # TODO: use something like this for a testnet toggle
+            self.buttonbox = QDialogButtonBox(
+                QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            )
+            self.buttonbox.accepted.connect(self.accept)
+            self.buttonbox.rejected.connect(self.reject)
+            self.layout.addWidget(self.buttonbox)
 
-        self.setLayout(vbox)
-        self.setFixedWidth(600)
+        # Initialize tab screen
+        self.seedpicker_tab = SeedpickerTab()
+        self.receive_tab = ReceiveTab()
+        self.send_tab = SendTab()
+
+        # Add tabs
+        for cnt, tab in enumerate(
+            [self.seedpicker_tab, self.receive_tab, self.send_tab]
+        ):
+            self.tab_widget.addTab(tab, tab.TITLE)
+            self.tab_widget.setTabToolTip(cnt, tab.HOVER)
+
+        # Add tabs to widget
+        self.layout.addWidget(self.tab_widget)
+        self.setLayout(self.layout)
 
 
 def main():
-    app = QApplication(sys.argv)
+    qapp = QApplication(sys.argv)
     my_app = MultiwalletApp()
     my_app.show()
-    app.exec()
+    qapp.exec()
 
 
 if __name__ == "__main__":
