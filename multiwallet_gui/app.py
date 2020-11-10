@@ -21,10 +21,7 @@ class MultiwalletApp(QDialog):
         self.setWindowTitle(
             "Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY"
         )
-
-        WIDTH = 800
-        HEIGHT = 600
-        self.resize(WIDTH, HEIGHT)
+        self.setFixedWidth(800)
 
         self.layout = QVBoxLayout()
 
