@@ -3,18 +3,18 @@
 GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/1321503036724989952).
 
 #### Seedpicker
-![](images/seedpicker.png)
+![](https://raw.githubusercontent.com/mflaxman/multiwallet/main/images/seedpicker.png)
 
 #### Recieve
-![](images/receive.png)
+![](https://raw.githubusercontent.com/mflaxman/multiwallet/main/images/receive.png)
 
 #### Send
-![](images/send.png)
+![](https://raw.githubusercontent.com/mflaxman/multiwallet/main/images/send.png)
 
 ## Install
 
 #### Easy
-Downloadable binary link here (MacOS only):
+Downloadable binary link here (MacOS only): 
 <https://github.com/mflaxman/multiwallet/releases>
 
 #### Medium
@@ -33,21 +33,28 @@ python3 setup.py develop
 python multiwallet_gui/app.py 
 ```
 
-## Make a Release
+## Roadmap:
+* Allow user to select limit/offset for receive address verfication
+* Add tooltips/explainers
+* Mainnet/testnet toggle
+* Add QR code generation on send/receive
+* Support arbitrary paths
+* Test/release on multiple OS
+* Better form handling/validation
+* Add libsec
+* Add webcam on receive/send
+* Sign release
+* Dark mode
+* Reproducible build
+
+## Maintainer Notes - Make a Release
 
 Downloadable MacOS binary:
 ```
 $ time ./make_macos_release.sh 
 ```
 
-TODO:
-* libsec
-* better form handling/validation
-* test/release on multiple OS
-* reproducible build
-* Make it look better
-* Add QR codes
-* Mainnet/testnet toggle
-* Add webcam
-* Support arbitrary paths
-* Dark mode
+Update PyPI:
+```
+$ time ./update_pypi.sh
+```
