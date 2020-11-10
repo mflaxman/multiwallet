@@ -29,9 +29,13 @@ class MultiwalletApp(QDialog):
         self.layout = QVBoxLayout()
 
         self.tab_widget = QTabWidget()
-        self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        self.buttonbox.accepted.connect(self.accept)
-        self.buttonbox.rejected.connect(self.reject)
+
+        if False:
+            # TODO: use something like this for a testnet toggle
+            self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            self.buttonbox.accepted.connect(self.accept)
+            self.buttonbox.rejected.connect(self.reject)
+            self.layout.addWidget(self.buttonbox)
 
         # Initialize tab screen
         self.seedpicker_tab = SeedpickerTab()
@@ -47,7 +51,6 @@ class MultiwalletApp(QDialog):
 
         # Add tabs to widget
         self.layout.addWidget(self.tab_widget)
-        self.layout.addWidget(self.buttonbox)
         self.setLayout(self.layout)
 
 

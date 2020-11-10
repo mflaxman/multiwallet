@@ -66,8 +66,8 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.setHidden(True)
 
         self.pubResultsLabel = QLabel("")
-        self.privResultsLabel.setToolTip(
-            "For export to your transaction coordinator (Specter-Desktop). This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
+        self.pubResultsLabel.setToolTip(
+            "For export to your online computer and eventaully other hardware wallets. This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
         )
         self.pubResultsEdit = QPlainTextEdit("")
         self.pubResultsEdit.setReadOnly(True)
