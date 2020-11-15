@@ -34,7 +34,7 @@ python multiwallet_gui/app.py
 ```
 
 ## Roadmap:
-* Mainnet/testnet toggle
+* Mainnet/testnet toggle on sending
 * Add QR code generation on send/receive
 * Support arbitrary paths
 * Test/release on multiple OS

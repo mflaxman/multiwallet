@@ -3,10 +3,11 @@
 from multiwallet_gui.helper import _clean_submisission, _msgbox_err
 
 from PyQt5.QtWidgets import (
-    QVBoxLayout,
     QLabel,
     QPlainTextEdit,
     QPushButton,
+    QRadioButton,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -43,7 +44,7 @@ class SeedpickerTab(QWidget):
         super().__init__()
         self.layout = QVBoxLayout()
 
-        self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed</b>")
+        self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed Phrase</b>")
         self.firstWordsLabel.setToolTip(
             "Pull words out of a hat so you don't have to trust a random number generator."
         )
@@ -52,7 +53,16 @@ class SeedpickerTab(QWidget):
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
-        # self.firstWordsSubmitButton = QPushButton(self)
+        # Network toggle
+        # https://www.tutorialspoint.com/pyqt/pyqt_qradiobutton_widget.htm
+        self.button_label = QLabel("<b>Bitcoin Network</b>")
+        self.button_label.setToolTip("We recommend practicing first on testnet.")
+        self.mainnet_button = QRadioButton("Mainnet (regular)")
+        # self.mainnet_button.toggled.connect(self.updateNetwork)  # TODO: wire up any changes to reset the form
+        self.mainnet_button.setChecked(False)
+        self.testnet_button = QRadioButton("Testnet")
+        self.testnet_button.setChecked(True)
+
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
         self.firstWordsSubmitButton.setText("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
@@ -73,13 +83,19 @@ class SeedpickerTab(QWidget):
         self.pubResultsEdit.setReadOnly(True)
         self.pubResultsEdit.setHidden(True)
 
-        self.layout.addWidget(self.firstWordsLabel)
-        self.layout.addWidget(self.firstWordsEdit)
-        self.layout.addWidget(self.firstWordsSubmitButton)
-        self.layout.addWidget(self.privResultsLabel)
-        self.layout.addWidget(self.privResultsEdit)
-        self.layout.addWidget(self.pubResultsLabel)
-        self.layout.addWidget(self.pubResultsEdit)
+        for widget in (
+            self.firstWordsLabel,
+            self.firstWordsEdit,
+            self.button_label,
+            self.mainnet_button,
+            self.testnet_button,
+            self.firstWordsSubmitButton,
+            self.privResultsLabel,
+            self.privResultsEdit,
+            self.pubResultsLabel,
+            self.pubResultsEdit,
+        ):
+            self.layout.addWidget(widget)
 
         self.setLayout(self.layout)
 
@@ -128,12 +144,14 @@ class SeedpickerTab(QWidget):
             )
 
         IS_TESTNET = True  # TESTNET ONLY FOR NOW
-        if IS_TESTNET:
-            PATH = "m/48'/1'/0'/2'"
-            SLIP132_VERSION_BYTES = "02575483"
-        else:
+        if self.mainnet_button.isChecked():
+            # Mainnet
             PATH = "m/48'/0'/0'/2'"
             SLIP132_VERSION_BYTES = "02aa7ed3"
+        else:
+            # Testent
+            PATH = "m/48'/1'/0'/2'"
+            SLIP132_VERSION_BYTES = "02575483"
 
         last_word = valid_checksum_words[0]
         hd_priv = HDPrivateKey.from_mnemonic(first_words + " " + last_word)
