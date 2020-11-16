@@ -3,6 +3,8 @@
 # Verbose printing
 set -o xtrace
 
+deactivate
+
 # Abandon if anything errors
 set -e;
 

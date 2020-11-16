@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 
-# TODO: script must be run by system python, pyinstaller doesn't play nicely with pyenv :(
-
 # Verbose printing
 set -o xtrace
+
+deactivate
 
 # Abandon if anything errors
 set -e;
@@ -22,6 +22,8 @@ black --check .
 flake8 .
 
 # Python stuff
+# pyinstaller can only go to the latest version of python3, so that's what we'll use
+pyenv global 3.6.12
 python3 --version
 # Install virtualenv (if not installed)
 # python3 -m pip uninstall virtualenv -y
