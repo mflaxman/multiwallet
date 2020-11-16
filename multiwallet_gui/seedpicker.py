@@ -143,15 +143,14 @@ class SeedpickerTab(QWidget):
                 informative_text=err_str,
             )
 
-        IS_TESTNET = True  # TESTNET ONLY FOR NOW
-        if self.mainnet_button.isChecked():
+        IS_TESTNET = self.testnet_button.isChecked()
+        if IS_TESTNET:
+            PATH = "m/48'/1'/0'/2'"
+            SLIP132_VERSION_BYTES = "02575483"
+        else:
             # Mainnet
             PATH = "m/48'/0'/0'/2'"
             SLIP132_VERSION_BYTES = "02aa7ed3"
-        else:
-            # Testent
-            PATH = "m/48'/1'/0'/2'"
-            SLIP132_VERSION_BYTES = "02575483"
 
         last_word = valid_checksum_words[0]
         hd_priv = HDPrivateKey.from_mnemonic(first_words + " " + last_word)
