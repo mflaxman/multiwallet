@@ -18,7 +18,7 @@ class MultiwalletApp(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(
-            "Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION TESTNET ONLY"
+            "Multiwallet - Stateless PSBT Multisig Wallet - ALPHA VERSION"
         )
         self.setFixedWidth(800)
 

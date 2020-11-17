@@ -202,7 +202,5 @@ class ReceiveTab(QWidget):
             is_testnet=pubkeys_info["is_testnet"],
         ):
             result = f"#{index}: {address}"
-            print("result", result)
             self.addrResultsEdit.appendPlainText(result)
             QApplication.processEvents()  # needed to stream output (otherwise terrible UX)
-        print("done")

@@ -1,6 +1,12 @@
 #! /usr/bin/env bash
 
-from multiwallet_gui.helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import (
+    BITCOIN_NETWORK_TOOLTIP,
+    BITCOIN_TESTNET_TOOLTIP,
+    BITCOIN_MAINNET_TOOLTIP,
+    _clean_submisission,
+    _msgbox_err,
+)
 
 from PyQt5.QtWidgets import (
     QLabel,
@@ -50,17 +56,20 @@ class SeedpickerTab(QWidget):
         )
         self.firstWordsEdit = QPlainTextEdit("")
         self.firstWordsEdit.setPlaceholderText(
-            "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
+            "Something like this:\n\nzoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
         # Network toggle
         # https://www.tutorialspoint.com/pyqt/pyqt_qradiobutton_widget.htm
         self.button_label = QLabel("<b>Bitcoin Network</b>")
-        self.button_label.setToolTip("We recommend practicing first on testnet.")
-        self.mainnet_button = QRadioButton("Mainnet (regular)")
-        # self.mainnet_button.toggled.connect(self.updateNetwork)  # TODO: wire up any changes to reset the form
+        self.button_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
+
+        self.mainnet_button = QRadioButton("Mainnet")
+        self.mainnet_button.setToolTip(BITCOIN_MAINNET_TOOLTIP)
         self.mainnet_button.setChecked(False)
+
         self.testnet_button = QRadioButton("Testnet")
+        self.testnet_button.setToolTip(BITCOIN_TESTNET_TOOLTIP)
         self.testnet_button.setChecked(True)
 
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
@@ -143,8 +152,8 @@ class SeedpickerTab(QWidget):
                 informative_text=err_str,
             )
 
-        IS_TESTNET = self.testnet_button.isChecked()
-        if IS_TESTNET:
+        self.IS_TESTNET = self.testnet_button.isChecked()
+        if self.IS_TESTNET:
             PATH = "m/48'/1'/0'/2'"
             SLIP132_VERSION_BYTES = "02575483"
         else:
@@ -174,7 +183,7 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
         self.pubResultsLabel.setText(
-            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if IS_TESTNET else 'Mainnet'}"
+            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
         )
         self.pubResultsEdit.setHidden(False)
         self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))

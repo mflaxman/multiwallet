@@ -34,25 +34,49 @@ python multiwallet_gui/app.py
 ```
 
 ## Roadmap:
-* Mainnet/testnet toggle on sending
+* Add detailed TX view (not just summary) to UI
 * Add QR code generation on send/receive
-* Support arbitrary paths
+* Add units (sats/BTC) toggle
 * Test/release on multiple OS
 * Better form handling/validation
+* Support arbitrary paths
 * Add libsec
 * Add webcam on receive/send
 * Sign binaries
 * Dark mode
 * Reproducible build
 
-## Maintainer Notes - Make a Release
+## Maintainer Notes for Releases
 
-Downloadable MacOS binary:
+Make a new release branch:
+```bash
+$ git checkout -b v0.x.x
+```
+
+Commit your changes, being sure to bump the version number in `setup.py`.
+
+Basic tests:
+```bash
+$ black --check . && flake8 .
+```
+
+Make a downloadable MacOS binary to upload to GitHub:
 ```
 $ ./make_macos_release.sh 
 ```
+
+Go to [GitHub release page](https://github.com/mflaxman/multiwallet/releases/new) and use tag version `v0.x.x` and target `v0.x.x` (target is the branch name which is independent of the tag).
+Write a title, description, and drag the binary from the previous step.
+Hit `Publish release`.
 
 Update PyPI:
 ```
 $ ./update_pypi.sh
 ```
+
+Merge into main:
+```
+$ git checkout main
+$ git merge v0.x.x
+```
+TODO: better to `merge` into `main` first?
