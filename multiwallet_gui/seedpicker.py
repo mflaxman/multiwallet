@@ -189,4 +189,4 @@ class SeedpickerTab(QWidget):
         )
         self.pubResultsROEdit.setHidden(False)
         self.pubResultsROEdit.appendPlainText("\n".join(pub_to_display))
-        return _msgbox_image(pixmap=create_qt_pixmap_qr(text=pub_to_display))
+        return _msgbox_image(text=pub_to_display)

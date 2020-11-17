@@ -1,8 +1,9 @@
 import qrcode
 
 from io import BytesIO
-from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QTextEdit
+from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QTextEdit, QDialog, QVBoxLayout, QLabel
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 
 
 class ResizeableMessageBox(QMessageBox):
@@ -69,10 +70,45 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
     msg.exec_()
 
 
-def _msgbox_image(pixmap, main_text=None, informative_text=None, detailed_text=None):
-    msg = ResizeableMessageBox()
-    msg.setIconPixmap(pixmap)
-    msg.exec_()
+class QRPopup(QDialog):
+
+    def __init__(self, text):
+        super().__init__()
+
+        self.setMaximumHeight(16777215)
+        self.setMaximumWidth(16777215)
+
+        self.text = text
+
+        self.vbox = QVBoxLayout()
+        # self.labelImage.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.labelImage.setPixmap(self.pixmap)
+
+        self.labelImage = QLabel()
+        self.labelImage.setMaximumWidth(16777215)
+
+        self._set_pixmap()
+
+        self.vbox.addWidget(self.labelImage)
+        self.setLayout(self.vbox)
+
+        self.show()
+
+    def _set_pixmap(self):
+        self.pixmap = create_qt_pixmap_qr(text=self.text).scaledToWidth(self.width() * .8)
+        print("width", self.width(), self.pixmap.width())
+        self.labelImage.setPixmap(self.pixmap)
+        self.labelImage.resize(self.width() * .8, self.height() * .8)
+        self.setLayout(self.vbox)
+        self.show()
+
+    def resizeEvent(self, event):
+        print("resize")
+        self.pixmap = self._set_pixmap()
+
+def _msgbox_image(text):
+    dialog = QRPopup(text=text)
+    dialog.exec_()
 
 
 def _is_libsec_enabled():
