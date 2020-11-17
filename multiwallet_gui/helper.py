@@ -28,3 +28,18 @@ def _is_libsec_enabled():
         return True
     except ModuleNotFoundError:
         return False
+
+
+BITCOIN_NETWORK_TOOLTIP = (
+    "Testnet is a great tool for practicing, as Testnet coins have no monetary value. "
+    "We recommend new users do a dry-run on Testnet before receiving real bitcoins."
+    "<br/><br/>"
+    "You can get free Testnet coins from several Testnet faucets."
+    "Testnet blocks"
+)
+
+BITCOIN_TESTNET_TOOLTIP = "Segwit Testnet addresses start with <i>tb1</i>..."
+
+BITCOIN_MAINNET_TOOLTIP = (
+    "Regular bitcoin transaction" "Segwit Mainnet addresses start with <i>bc1</i>..."
+)

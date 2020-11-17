@@ -1,12 +1,19 @@
 #! /usr/bin/env bash
 
-from multiwallet_gui.helper import _clean_submisission, _msgbox_err
+from multiwallet_gui.helper import (
+    BITCOIN_NETWORK_TOOLTIP,
+    BITCOIN_TESTNET_TOOLTIP,
+    BITCOIN_MAINNET_TOOLTIP,
+    _clean_submisission,
+    _msgbox_err,
+)
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QLabel,
     QPlainTextEdit,
     QPushButton,
+    QRadioButton,
 )
 
 
@@ -52,6 +59,31 @@ class SendTab(QWidget):
         self.psbtEdit = QPlainTextEdit("")
         self.psbtEdit.setPlaceholderText("Something like this:\n\ncHNidP8BAH0CAAAAA...")
 
+        # Network toggle
+        # https://www.tutorialspoint.com/pyqt/pyqt_qradiobutton_widget.htm
+        self.button_label = QLabel("<b>Bitcoin Network</b>")
+        self.button_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
+
+        self.infernetwork_button = QRadioButton("Smart Guess (default)")
+        self.infernetwork_button.setToolTip(
+            "Non-experts should choose this option."
+            "<br/><br/>"
+            "The current PSBT serialization format does not encode which network the transaction is on, but this software can usually infer the network based on the BIP32 path used. "
+            "If the address displayed is in the wrong format (<i>bc1...</i> vs <i>tb1...</i>) then you may need to manually select the network."
+        )
+        self.infernetwork_button.setChecked(True)
+
+        self.mainnet_button = QRadioButton("Mainnet")
+        self.mainnet_button.setToolTip(BITCOIN_MAINNET_TOOLTIP)
+        self.mainnet_button.setChecked(False)
+
+        self.testnet_button = QRadioButton("Testnet")
+        self.testnet_button.setToolTip(BITCOIN_TESTNET_TOOLTIP)
+        self.testnet_button.setChecked(False)
+
+        self.psbtSubmitButton = QPushButton("Decode Transaction")
+        self.psbtSubmitButton.clicked.connect(self.decode_psbt)
+
         self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b> (optional)")
         self.fullSeedLabel.setToolTip(
             "Needed to sign the PSBT. You can first decode the transaction and inspect it without supplying your seed phrase."
@@ -61,20 +93,17 @@ class SendTab(QWidget):
             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo"
         )
 
+        self.fullSeedSubmitButton = QPushButton("Sign Transaction")
+        self.fullSeedSubmitButton.clicked.connect(self.sign_psbt)
+
         self.psbtDecodedLabel = QLabel("")
         self.psbtDecodedLabel.setToolTip(
             "The summary of what this transaction does. Multiwallet statelessly verifies all inputs belong to the same quorum and that any change is properly returned."
         )
 
-        self.psbtDecodedEdit = QPlainTextEdit("")
-        self.psbtDecodedEdit.setReadOnly(True)
-        self.psbtDecodedEdit.setHidden(True)
-
-        self.psbtSubmitButton = QPushButton("Decode Transaction")
-        self.psbtSubmitButton.clicked.connect(self.decode_psbt)
-
-        self.fullSeedSubmitButton = QPushButton("Sign Transaction")
-        self.fullSeedSubmitButton.clicked.connect(self.sign_psbt)
+        self.psbtDecodedROEdit = QPlainTextEdit("")
+        self.psbtDecodedROEdit.setReadOnly(True)
+        self.psbtDecodedROEdit.setHidden(True)
 
         self.psbtSignedLabel = QLabel("")
         self.psbtSignedLabel.setToolTip(
@@ -84,16 +113,23 @@ class SendTab(QWidget):
         self.psbtSignedEdit.setReadOnly(True)
         self.psbtSignedEdit.setHidden(True)
 
-        vbox.addWidget(self.psbtLabel)
-        vbox.addWidget(self.psbtEdit)
-        vbox.addWidget(self.psbtSubmitButton)
-        vbox.addWidget(self.fullSeedLabel)
-        vbox.addWidget(self.fullSeedEdit)
-        vbox.addWidget(self.fullSeedSubmitButton)
-        vbox.addWidget(self.psbtDecodedLabel)
-        vbox.addWidget(self.psbtDecodedEdit)
-        vbox.addWidget(self.psbtSignedLabel)
-        vbox.addWidget(self.psbtSignedEdit)
+        for widget in (
+            self.psbtLabel,
+            self.psbtEdit,
+            self.button_label,
+            self.infernetwork_button,
+            self.mainnet_button,
+            self.testnet_button,
+            self.psbtSubmitButton,
+            self.fullSeedLabel,
+            self.fullSeedEdit,
+            self.fullSeedSubmitButton,
+            self.psbtDecodedLabel,
+            self.psbtDecodedROEdit,
+            self.psbtSignedLabel,
+            self.psbtSignedEdit,
+        ):
+            vbox.addWidget(widget)
 
         self.setLayout(vbox)
 
@@ -106,13 +142,23 @@ class SendTab(QWidget):
     def process_psbt(self, sign_tx=True):
         # Clear any previous submission in case of errors
         self.psbtDecodedLabel.setText("")
-        self.psbtDecodedEdit.clear()
-        self.psbtDecodedEdit.setHidden(True)
+        self.psbtDecodedROEdit.clear()
+        self.psbtDecodedROEdit.setHidden(True)
 
         self.psbtSignedLabel.setText("")
         self.psbtSignedEdit.clear()
         self.psbtSignedEdit.setHidden(True)
         # TODO: why setText and not hide?
+
+        if self.infernetwork_button.isChecked():
+            PARSE_WITH_TESTNET = None
+        elif self.mainnet_button.isChecked():
+            PARSE_WITH_TESTNET = False
+        elif self.testnet_button.isChecked():
+            PARSE_WITH_TESTNET = True
+        else:
+            # This shouldn't be possible
+            raise Exception("Invalid Network Selection: No Radio Button Chosen")
 
         psbt_str = _clean_submisission(self.psbtEdit.toPlainText())
 
@@ -123,14 +169,25 @@ class SendTab(QWidget):
             )
 
         try:
-            psbt_obj = PSBT.parse_base64(b64=psbt_str, testnet=self.IS_TESTNET)
+            psbt_obj = PSBT.parse_base64(b64=psbt_str, testnet=PARSE_WITH_TESTNET)
         except Exception as e:
-            return _msgbox_err(
-                main_text="PSBT Parse Error",
-                informative_text="Are you sure that's a PSBT?",
-                detailed_text=str(e),
-            )
-        TX_FEE_SATS = psbt_obj.tx_obj.fee()
+            if type(e) is ValueError and str(e) == "Mainnet/Testnet mixing":
+                # TODO: less hackey way to catch this error?
+                return _msgbox_err(
+                    main_text="PSBT Network Error",
+                    informative_text="The network you selected doesn't match the PSBT.",
+                    detailed_text=str(e),
+                )
+            else:
+                return _msgbox_err(
+                    main_text="PSBT Parse Error",
+                    informative_text="Are you sure that's a valid PSBT?",
+                    detailed_text=str(e),
+                )
+
+        # Parse TX
+        self.TX_FEE_SATS = psbt_obj.tx_obj.fee()
+        self.IS_TESTNET = psbt_obj.tx_obj.testnet
 
         # Validate multisig transaction
         # TODO: abstract some of this into buidl library?
@@ -288,18 +345,23 @@ class SendTab(QWidget):
                 "to",
                 spend_addr,
                 "with a fee of",
-                _format_satoshis(TX_FEE_SATS, in_btc=self.UNITS == "btc"),
-                f"({round(TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
+                _format_satoshis(self.TX_FEE_SATS, in_btc=self.UNITS == "btc"),
+                f"({round(self.TX_FEE_SATS / TOTAL_INPUT_SATS * 100, 2)}% of spend)",
             ]
         )
-        self.psbtDecodedLabel.setText("<b>Decoded Transaction Summary</b>")
-        self.psbtDecodedEdit.setHidden(False)
-        self.psbtDecodedEdit.appendPlainText(TX_SUMMARY)
+        self.psbtDecodedLabel.setText(
+            f"<b>Decoded Transaction Summary</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+        )
+        self.psbtDecodedROEdit.setHidden(False)
+        self.psbtDecodedROEdit.appendPlainText(TX_SUMMARY)
 
         # TODO: surface this to user somehow
         to_print = []
         to_print.append("DETAILED VIEW")
         to_print.append(f"TXID: {psbt_obj.tx_obj.id()}")
+        to_print.append(
+            f"Network: {'Testnet' if psbt_obj.tx_obj.testnet else 'Mainnet'}"
+        )
         to_print.append("-" * 80)
         to_print.append(f"{len(inputs_desc)} Input(s):")
         for cnt, input_desc in enumerate(inputs_desc):
