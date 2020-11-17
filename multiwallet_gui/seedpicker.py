@@ -5,7 +5,9 @@ from multiwallet_gui.helper import (
     BITCOIN_TESTNET_TOOLTIP,
     BITCOIN_MAINNET_TOOLTIP,
     _clean_submisission,
+    create_qt_pixmap_qr,
     _msgbox_err,
+    _msgbox_image,
 )
 
 from PyQt5.QtWidgets import (
@@ -88,9 +90,9 @@ class SeedpickerTab(QWidget):
         self.pubResultsLabel.setToolTip(
             "For export to your online computer and eventaully other hardware wallets. This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
         )
-        self.pubResultsEdit = QPlainTextEdit("")
-        self.pubResultsEdit.setReadOnly(True)
-        self.pubResultsEdit.setHidden(True)
+        self.pubResultsROEdit = QPlainTextEdit("")
+        self.pubResultsROEdit.setReadOnly(True)
+        self.pubResultsROEdit.setHidden(True)
 
         for widget in (
             self.firstWordsLabel,
@@ -102,7 +104,7 @@ class SeedpickerTab(QWidget):
             self.privResultsLabel,
             self.privResultsEdit,
             self.pubResultsLabel,
-            self.pubResultsEdit,
+            self.pubResultsROEdit,
         ):
             self.layout.addWidget(widget)
 
@@ -116,8 +118,8 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.clear()
         self.privResultsEdit.setHidden(True)
         self.privResultsLabel.setText("")
-        self.pubResultsEdit.clear()
-        self.pubResultsEdit.setHidden(True)
+        self.pubResultsROEdit.clear()
+        self.pubResultsROEdit.setHidden(True)
         self.pubResultsLabel.setText("")
         # TODO: why setText and not hide?
 
@@ -185,5 +187,6 @@ class SeedpickerTab(QWidget):
         self.pubResultsLabel.setText(
             f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
         )
-        self.pubResultsEdit.setHidden(False)
-        self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))
+        self.pubResultsROEdit.setHidden(False)
+        self.pubResultsROEdit.appendPlainText("\n".join(pub_to_display))
+        return _msgbox_image(pixmap=create_qt_pixmap_qr(text=pub_to_display))

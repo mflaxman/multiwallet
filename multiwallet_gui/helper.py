@@ -1,4 +1,53 @@
-from PyQt5.QtWidgets import QMessageBox
+import qrcode
+
+from io import BytesIO
+from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QTextEdit
+from PyQt5.QtGui import QPixmap
+
+
+class ResizeableMessageBox(QMessageBox):
+    # https://stackoverflow.com/a/2664019/1754586
+
+    def __init__(self):
+        QMessageBox.__init__(self)
+        self.setSizeGripEnabled(True)
+
+    def event(self, e):
+        result = QMessageBox.event(self, e)
+
+        self.setMinimumHeight(0)
+        self.setMaximumHeight(16777215)
+        self.setMinimumWidth(0)
+        self.setMaximumWidth(16777215)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        textEdit = self.findChild(QTextEdit)
+        if textEdit != None :
+            textEdit.setMinimumHeight(0)
+            textEdit.setMaximumHeight(16777215)
+            textEdit.setMinimumWidth(0)
+            textEdit.setMaximumWidth(16777215)
+            textEdit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        return result
+
+
+def create_qt_pixmap_qr(text):
+    """
+    How to use this:
+      label.setText("")
+      label.setPixmap(create_qt_pixmap_qr(text="foo"))
+
+    https://stackoverflow.com/a/58251630/1754586
+    """
+
+
+    buf = BytesIO()
+    img = qrcode.make(text)
+    img.save(buf, "PNG")
+    qt_pixmap = QPixmap()
+    qt_pixmap.loadFromData(buf.getvalue(), "PNG")
+    return qt_pixmap
 
 
 def _clean_submisission(string):
@@ -17,6 +66,12 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
 
     if detailed_text:
         msg.setDetailedText(detailed_text)
+    msg.exec_()
+
+
+def _msgbox_image(pixmap, main_text=None, informative_text=None, detailed_text=None):
+    msg = ResizeableMessageBox()
+    msg.setIconPixmap(pixmap)
     msg.exec_()
 
 

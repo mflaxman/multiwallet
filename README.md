@@ -13,6 +13,22 @@ GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/13215030367
 
 ## Install
 
+### Pillow (for QR Codes)
+
+Mac:
+```
+$ brew install libtiff libjpeg webp little-cms2
+```
+
+Ubuntu:
+```
+$ sudo apt-get install python3-dev python3-setuptools apt-get install libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk libharfbuzz-dev libfribidi-dev libxcb1-dev
+```
+
+For more see instructions [here](https://pillow.readthedocs.io/en/latest/installation.html)
+
+### Multiwallet
+
 #### Easy
 Downloadable binary link here (MacOS only):  
 <https://github.com/mflaxman/multiwallet/releases>
