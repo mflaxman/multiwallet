@@ -111,6 +111,7 @@ class ReceiveTab(QWidget):
 
     def __init__(self):
         super().__init__()
+
         vbox = QVBoxLayout(self)
 
         self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
@@ -124,7 +125,9 @@ class ReceiveTab(QWidget):
         )
 
         self.addresses_label = QLabel("<b>Addresses to Derive</b>")
-        self.addresses_label.setToolTip("Address derivation without libsecp256k1 installed is slow, you may want to be targetted about which addresses to derive.")
+        self.addresses_label.setToolTip(
+            "Address derivation without libsecp256k1 installed is slow, you may want to be targetted about which addresses to derive."
+        )
 
         hbox = QHBoxLayout(self)
 
@@ -140,7 +143,12 @@ class ReceiveTab(QWidget):
         self.offset_box.setValue(0)
         self.offset_box.setMinimum(0)
 
-        for widget in self.limit_label, self.limit_box, self.offset_label, self.offset_box:
+        for widget in (
+            self.limit_label,
+            self.limit_box,
+            self.offset_label,
+            self.offset_box,
+        ):
             hbox.addWidget(widget)
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
@@ -160,9 +168,12 @@ class ReceiveTab(QWidget):
             vbox.addWidget(widget)
 
         vbox.addLayout(hbox)
-        # vbox.addStretch()  # FIXME
-        
-        for widget in self.descriptorSubmitButton, self.addrResultsLabel, self.addrResultsROEdit:
+
+        for widget in (
+            self.descriptorSubmitButton,
+            self.addrResultsLabel,
+            self.addrResultsROEdit,
+        ):
             vbox.addWidget(widget)
 
         self.setLayout(vbox)

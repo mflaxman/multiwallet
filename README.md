@@ -13,6 +13,10 @@ GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/13215030367
 
 ## Install
 
+#### Telegram Community Chat Group
+Ask Qs here: 
+<https://t.me/multiwallet>
+
 ### Pillow (for QR Codes)
 
 Mac:
