@@ -114,11 +114,7 @@ class SeedpickerTab(QWidget):
         self.qrButton.setHidden(True)
         self.qrButton.clicked.connect(self.make_qr_popup)
 
-        for widget in (
-            self.firstWordsLabel,
-            self.firstWordsEdit,
-            self.button_label
-        ):
+        for widget in (self.firstWordsLabel, self.firstWordsEdit, self.button_label):
             vbox.addWidget(widget)
 
         vbox.addLayout(hbox)

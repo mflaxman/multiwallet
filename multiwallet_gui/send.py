@@ -10,12 +10,13 @@ from multiwallet_gui.helper import (
     qr_dialog,
 )
 from PyQt5.QtWidgets import (
-    QVBoxLayout,
-    QWidget,
+    QHBoxLayout,
     QLabel,
     QPlainTextEdit,
     QPushButton,
     QRadioButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 
@@ -50,7 +51,7 @@ class SendTab(QWidget):
     def __init__(self):
         super().__init__()
 
-        vbox = QVBoxLayout()
+        vbox = QVBoxLayout(self)
 
         self.psbtLabel = QLabel(
             "<b>Partially Signed Bitcoin Transaction</b> (required)"
@@ -63,8 +64,10 @@ class SendTab(QWidget):
 
         # Network toggle
         # https://www.tutorialspoint.com/pyqt/pyqt_qradiobutton_widget.htm
-        self.button_label = QLabel("<b>Bitcoin Network</b>")
-        self.button_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
+        self.network_label = QLabel("<b>Bitcoin Network</b>")
+        self.network_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
+
+        hbox = QHBoxLayout(self)
 
         self.infernetwork_button = QRadioButton("Automatic")
         self.infernetwork_button.setToolTip(
@@ -82,6 +85,13 @@ class SendTab(QWidget):
         self.testnet_button = QRadioButton("Testnet")
         self.testnet_button.setToolTip(BITCOIN_TESTNET_TOOLTIP)
         self.testnet_button.setChecked(False)
+
+        for widget in (
+            self.infernetwork_button,
+            self.mainnet_button,
+            self.testnet_button,
+        ):
+            hbox.addWidget(widget)
 
         self.psbtSubmitButton = QPushButton("Decode Transaction")
         self.psbtSubmitButton.clicked.connect(self.decode_psbt)
@@ -123,10 +133,13 @@ class SendTab(QWidget):
         for widget in (
             self.psbtLabel,
             self.psbtEdit,
-            self.button_label,
-            self.infernetwork_button,
-            self.mainnet_button,
-            self.testnet_button,
+            self.network_label,
+        ):
+            vbox.addWidget(widget)
+
+        vbox.addLayout(hbox)
+
+        for widget in (
             self.psbtSubmitButton,
             self.fullSeedLabel,
             self.fullSeedEdit,
