@@ -7,7 +7,7 @@ from multiwallet_gui.helper import (
     _clean_submisission,
     create_qt_pixmap_qr,
     _msgbox_err,
-    _msgbox_image,
+    qr_dialog,
 )
 
 from PyQt5.QtWidgets import (
@@ -184,9 +184,8 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
-        self.pubResultsLabel.setText(
-            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
-        )
+        pubkey_results_text = f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+        self.pubResultsLabel.setText(pubkey_results_text)
         self.pubResultsROEdit.setHidden(False)
         self.pubResultsROEdit.appendPlainText("\n".join(pub_to_display))
-        return _msgbox_image(text=pub_to_display)
+        qr_dialog(qr_text=pub_to_display, window_title=pubkey_results_text)

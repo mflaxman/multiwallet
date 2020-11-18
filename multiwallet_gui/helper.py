@@ -1,4 +1,5 @@
 import qrcode
+import re
 
 from io import BytesIO
 from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QTextEdit, QDialog, QVBoxLayout, QLabel
@@ -6,31 +7,10 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 
-class ResizeableMessageBox(QMessageBox):
-    # https://stackoverflow.com/a/2664019/1754586
-
-    def __init__(self):
-        QMessageBox.__init__(self)
-        self.setSizeGripEnabled(True)
-
-    def event(self, e):
-        result = QMessageBox.event(self, e)
-
-        self.setMinimumHeight(0)
-        self.setMaximumHeight(16777215)
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(16777215)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        textEdit = self.findChild(QTextEdit)
-        if textEdit != None :
-            textEdit.setMinimumHeight(0)
-            textEdit.setMaximumHeight(16777215)
-            textEdit.setMinimumWidth(0)
-            textEdit.setMaximumWidth(16777215)
-            textEdit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        return result
+def strip_html(data):
+    # https://stackoverflow.com/questions/3398852/using-python-remove-html-tags-formatting-from-a-string
+    p = re.compile(r'<.*?>')
+    return p.sub('', data)
 
 
 def create_qt_pixmap_qr(text):
@@ -72,19 +52,20 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
 
 class QRPopup(QDialog):
 
-    def __init__(self, text):
+    def __init__(self, window_title, qr_text):
         super().__init__()
+
+        self.setWindowTitle(window_title)
 
         self.setMaximumHeight(16777215)
         self.setMaximumWidth(16777215)
 
-        self.text = text
+        self.qr_text = qr_text
 
         self.vbox = QVBoxLayout()
-        # self.labelImage.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.labelImage.setPixmap(self.pixmap)
 
         self.labelImage = QLabel()
+        self.labelImage.setMaximumHeight(16777215)
         self.labelImage.setMaximumWidth(16777215)
 
         self._set_pixmap()
@@ -95,20 +76,15 @@ class QRPopup(QDialog):
         self.show()
 
     def _set_pixmap(self):
-        self.pixmap = create_qt_pixmap_qr(text=self.text).scaledToWidth(self.width() * .8)
-        print("width", self.width(), self.pixmap.width())
+        self.pixmap = create_qt_pixmap_qr(text=self.qr_text).scaledToHeight(self.height() * .9)
         self.labelImage.setPixmap(self.pixmap)
-        self.labelImage.resize(self.width() * .8, self.height() * .8)
-        self.setLayout(self.vbox)
-        self.show()
 
     def resizeEvent(self, event):
-        print("resize")
         self.pixmap = self._set_pixmap()
 
-def _msgbox_image(text):
-    dialog = QRPopup(text=text)
-    dialog.exec_()
+def qr_dialog(qr_text, window_title):
+    dialog = QRPopup(qr_text=qr_text, window_title=strip_html(window_title))
+    return dialog.exec_()
 
 
 def _is_libsec_enabled():
