@@ -4,8 +4,8 @@ from multiwallet_gui.helper import (
     BITCOIN_NETWORK_TOOLTIP,
     BITCOIN_TESTNET_TOOLTIP,
     BITCOIN_MAINNET_TOOLTIP,
+    create_qr_icon,
     _clean_submisission,
-    create_qt_pixmap_qr,
     _msgbox_err,
     qr_dialog,
 )
@@ -75,7 +75,6 @@ class SeedpickerTab(QWidget):
         self.testnet_button.setChecked(True)
 
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
-        self.firstWordsSubmitButton.setText("Calculate Full Seed")  # FIXME?
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
@@ -94,7 +93,8 @@ class SeedpickerTab(QWidget):
         self.pubResultsROEdit.setReadOnly(True)
         self.pubResultsROEdit.setHidden(True)
 
-        self.qrButton = QPushButton("")
+        self.qrButton = QPushButton()
+        self.qrButton.setText("QR")
         self.qrButton.setHidden(True)
         self.qrButton.clicked.connect(self.make_qr_popup)
 
@@ -128,7 +128,6 @@ class SeedpickerTab(QWidget):
         self.pubResultsLabel.setText("")
         self.qrButton.setHidden(True)
         self.qrButton.setText("")
-        
         # TODO: why setText and not hide?
 
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
@@ -192,13 +191,19 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
-        pubkey_results_text = f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+        pubkey_results_text = (
+            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+        )
         self.pubResultsLabel.setText(pubkey_results_text)
         self.pubResultsROEdit.setHidden(False)
         self.pubResultsROEdit.appendPlainText("\n".join(pub_to_display))
 
         self.qrButton.setHidden(False)
         self.qrButton.setText("QR")
+        self.qrButton.setIcon(create_qr_icon())
 
     def make_qr_popup(self):
-        qr_dialog(qr_text=self.pubResultsROEdit.toPlainText(), window_title=self.pubResultsLabel.text())
+        qr_dialog(
+            qr_text=self.pubResultsROEdit.toPlainText(),
+            window_title=self.pubResultsLabel.text(),
+        )

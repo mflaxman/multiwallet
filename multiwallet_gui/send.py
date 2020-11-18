@@ -5,7 +5,9 @@ from multiwallet_gui.helper import (
     BITCOIN_TESTNET_TOOLTIP,
     BITCOIN_MAINNET_TOOLTIP,
     _clean_submisission,
+    create_qr_icon,
     _msgbox_err,
+    qr_dialog,
 )
 from PyQt5.QtWidgets import (
     QVBoxLayout,
@@ -44,10 +46,10 @@ class SendTab(QWidget):
 
     # FIXME (add support and UX for this)
     UNITS = "sats"
-    IS_TESTNET = True  # No way to reliably infer this from the PSBT unfortunately :(
 
     def __init__(self):
         super().__init__()
+
         vbox = QVBoxLayout()
 
         self.psbtLabel = QLabel(
@@ -109,9 +111,14 @@ class SendTab(QWidget):
         self.psbtSignedLabel.setToolTip(
             "Signed version for your online computer to broadcast to the bitcoin network (once you have collected enough signatures)."
         )
-        self.psbtSignedEdit = QPlainTextEdit("")
-        self.psbtSignedEdit.setReadOnly(True)
-        self.psbtSignedEdit.setHidden(True)
+        self.psbtSignedROEdit = QPlainTextEdit("")
+        self.psbtSignedROEdit.setReadOnly(True)
+        self.psbtSignedROEdit.setHidden(True)
+
+        self.qrButton = QPushButton()
+        self.qrButton.setText("QR")
+        self.qrButton.setHidden(True)
+        self.qrButton.clicked.connect(self.make_qr_popup)
 
         for widget in (
             self.psbtLabel,
@@ -127,7 +134,8 @@ class SendTab(QWidget):
             self.psbtDecodedLabel,
             self.psbtDecodedROEdit,
             self.psbtSignedLabel,
-            self.psbtSignedEdit,
+            self.psbtSignedROEdit,
+            self.qrButton,
         ):
             vbox.addWidget(widget)
 
@@ -139,6 +147,12 @@ class SendTab(QWidget):
     def sign_psbt(self):
         return self.process_psbt(sign_tx=True)
 
+    def make_qr_popup(self):
+        return qr_dialog(
+            qr_text=self.psbtSignedROEdit.toPlainText(),
+            window_title=self.psbtSignedLabel.text(),
+        )
+
     def process_psbt(self, sign_tx=True):
         # Clear any previous submission in case of errors
         self.psbtDecodedLabel.setText("")
@@ -146,8 +160,11 @@ class SendTab(QWidget):
         self.psbtDecodedROEdit.setHidden(True)
 
         self.psbtSignedLabel.setText("")
-        self.psbtSignedEdit.clear()
-        self.psbtSignedEdit.setHidden(True)
+        self.psbtSignedROEdit.clear()
+        self.psbtSignedROEdit.setHidden(True)
+
+        self.qrButton.setHidden(True)
+        self.qrButton.setText("")
         # TODO: why setText and not hide?
 
         if self.infernetwork_button.isChecked():
@@ -433,8 +450,12 @@ class SendTab(QWidget):
         try:
             if psbt_obj.sign_with_private_keys(private_keys) is True:
                 self.psbtSignedLabel.setText("<b>Signed PSBT to Broadcast</b>")
-                self.psbtSignedEdit.setHidden(False)
-                self.psbtSignedEdit.appendPlainText(psbt_obj.serialize_base64())
+                self.psbtSignedROEdit.setHidden(False)
+                self.psbtSignedROEdit.appendPlainText(psbt_obj.serialize_base64())
+
+                self.qrButton.setHidden(False)
+                self.qrButton.setText("QR")
+                self.qrButton.setIcon(create_qr_icon())
             else:
                 return _msgbox_err(
                     main_text="Transaction Not Signed",

@@ -2,15 +2,18 @@ import qrcode
 import re
 
 from io import BytesIO
-from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QTextEdit, QDialog, QVBoxLayout, QLabel
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMessageBox, QDialog, QVBoxLayout, QLabel
+from PyQt5.QtGui import QPixmap, QIcon
 
 
 def strip_html(data):
     # https://stackoverflow.com/questions/3398852/using-python-remove-html-tags-formatting-from-a-string
-    p = re.compile(r'<.*?>')
-    return p.sub('', data)
+    p = re.compile(r"<.*?>")
+    return p.sub("", data)
+
+
+def create_qr_icon():
+    return QIcon("multiwallet_gui/images/qr.png")
 
 
 def create_qt_pixmap_qr(text):
@@ -21,8 +24,6 @@ def create_qt_pixmap_qr(text):
 
     https://stackoverflow.com/a/58251630/1754586
     """
-
-
     buf = BytesIO()
     img = qrcode.make(text)
     img.save(buf, "PNG")
@@ -51,7 +52,6 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
 
 
 class QRPopup(QDialog):
-
     def __init__(self, window_title, qr_text):
         super().__init__()
 
@@ -76,11 +76,14 @@ class QRPopup(QDialog):
         self.show()
 
     def _set_pixmap(self):
-        self.pixmap = create_qt_pixmap_qr(text=self.qr_text).scaledToHeight(self.height() * .9)
+        self.pixmap = create_qt_pixmap_qr(text=self.qr_text).scaledToHeight(
+            self.height() * 0.9
+        )
         self.labelImage.setPixmap(self.pixmap)
 
     def resizeEvent(self, event):
         self.pixmap = self._set_pixmap()
+
 
 def qr_dialog(qr_text, window_title):
     dialog = QRPopup(qr_text=qr_text, window_title=strip_html(window_title))
