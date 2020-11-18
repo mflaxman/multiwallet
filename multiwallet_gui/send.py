@@ -9,6 +9,7 @@ from multiwallet_gui.helper import (
     _msgbox_err,
     qr_dialog,
 )
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -92,6 +93,7 @@ class SendTab(QWidget):
             self.testnet_button,
         ):
             hbox.addWidget(widget)
+        hbox.setAlignment(Qt.AlignCenter)
 
         self.psbtSubmitButton = QPushButton("Decode Transaction")
         self.psbtSubmitButton.clicked.connect(self.decode_psbt)

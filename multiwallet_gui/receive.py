@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QSpinBox,
 )
+from PyQt5.QtCore import Qt
 
 from multiwallet_gui.helper import _clean_submisission, _msgbox_err, _is_libsec_enabled
 
@@ -150,6 +151,8 @@ class ReceiveTab(QWidget):
             self.offset_box,
         ):
             hbox.addWidget(widget)
+
+        hbox.setAlignment(Qt.AlignCenter)
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)

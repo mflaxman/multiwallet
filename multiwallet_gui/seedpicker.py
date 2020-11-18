@@ -10,6 +10,7 @@ from multiwallet_gui.helper import (
     qr_dialog,
 )
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -80,6 +81,7 @@ class SeedpickerTab(QWidget):
 
         for widget in self.mainnet_button, self.testnet_button:
             hbox.addWidget(widget)
+        hbox.setAlignment(Qt.AlignCenter)
 
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)

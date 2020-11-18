@@ -9,8 +9,9 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from multiwallet_gui.seedpicker import SeedpickerTab
+from multiwallet_gui.about import AboutTab
 from multiwallet_gui.receive import ReceiveTab
+from multiwallet_gui.seedpicker import SeedpickerTab
 from multiwallet_gui.send import SendTab
 
 
@@ -27,13 +28,14 @@ class MultiwalletApp(QDialog):
         self.tab_widget = QTabWidget()
 
         # Initialize tab screen
+        self.about_tab = AboutTab()
         self.seedpicker_tab = SeedpickerTab()
         self.receive_tab = ReceiveTab()
         self.send_tab = SendTab()
 
         # Add tabs
         for cnt, tab in enumerate(
-            [self.seedpicker_tab, self.receive_tab, self.send_tab]
+            [self.about_tab, self.seedpicker_tab, self.receive_tab, self.send_tab]
         ):
             self.tab_widget.addTab(tab, tab.TITLE)
             self.tab_widget.setTabToolTip(cnt, tab.HOVER)
