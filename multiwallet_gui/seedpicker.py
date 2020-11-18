@@ -204,6 +204,7 @@ class SeedpickerTab(QWidget):
 
     def make_qr_popup(self):
         qr_dialog(
+            qwidget=self,
             qr_text=self.pubResultsROEdit.toPlainText(),
             window_title=self.pubResultsLabel.text(),
         )

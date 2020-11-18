@@ -50,14 +50,16 @@ python multiwallet_gui/app.py
 ```
 
 ## Roadmap:
+* Add support for choosing other checksum words
 * Add detailed TX view (not just summary) to UI
-* Add QR code generation on send/receive
+* Add QR encode on address verification
+* Add QR gifs
 * Add units (sats/BTC) toggle
 * Test/release on multiple OS
 * Better form handling/validation
 * Support arbitrary paths
 * Add libsec
-* Add webcam on receive/send
+* Add webcam on receive/send for qrdecode
 * Sign binaries
 * Dark mode
 * Reproducible build

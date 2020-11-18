@@ -52,10 +52,11 @@ def _msgbox_err(main_text=None, informative_text=None, detailed_text=None):
 
 
 class QRPopup(QDialog):
-    def __init__(self, window_title, qr_text):
+    def __init__(self, qr_text, window_title, window_height):
         super().__init__()
 
         self.setWindowTitle(window_title)
+        # self.height = window_height
 
         self.setMaximumHeight(16777215)
         self.setMaximumWidth(16777215)
@@ -68,16 +69,19 @@ class QRPopup(QDialog):
         self.labelImage.setMaximumHeight(16777215)
         self.labelImage.setMaximumWidth(16777215)
 
-        self._set_pixmap()
+        self._set_pixmap(height_to_use=window_height * 0.9)
 
         self.vbox.addWidget(self.labelImage)
         self.setLayout(self.vbox)
 
         self.show()
 
-    def _set_pixmap(self):
+    def _set_pixmap(self, height_to_use=None):
+        if height_to_use is None:
+            height_to_use = self.height() * 0.9
+
         self.pixmap = create_qt_pixmap_qr(text=self.qr_text).scaledToHeight(
-            self.height() * 0.9
+            height_to_use
         )
         self.labelImage.setPixmap(self.pixmap)
 
@@ -85,8 +89,14 @@ class QRPopup(QDialog):
         self.pixmap = self._set_pixmap()
 
 
-def qr_dialog(qr_text, window_title):
-    dialog = QRPopup(qr_text=qr_text, window_title=strip_html(window_title))
+def qr_dialog(qwidget, qr_text, window_title):
+    # set to 90% of max size: https://stackoverflow.com/questions/35887237/current-screen-size-in-python3-with-pyqt5
+    window_height = qwidget.screen().size().height() * 0.9
+    dialog = QRPopup(
+        qr_text=qr_text,
+        window_title=strip_html(window_title),
+        window_height=window_height,
+    )
     return dialog.exec_()
 
 
