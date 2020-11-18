@@ -127,6 +127,11 @@ class SendTab(QWidget):
 
         self.qrButton = QPushButton()
         self.qrButton.setText("QR")
+        self.qrButton.setToolTip(
+            "For transmitting to your online computer via webcam."
+            "<br/><br/>"
+            "This is a great way to preserve your airgap."
+        )
         self.qrButton.setHidden(True)
         self.qrButton.clicked.connect(self.make_qr_popup)
 
