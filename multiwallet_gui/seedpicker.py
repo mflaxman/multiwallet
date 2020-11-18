@@ -79,7 +79,9 @@ class SeedpickerTab(QWidget):
 
         self.privResultsLabel = QLabel("")
         self.privResultsLabel.setToolTip(
-            "Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place. This represents your bitcoin <i>private</i> keys."
+            "Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place."
+            "<br/><br/>"
+            "This represents your bitcoin <i>private</i> keys."
         )
         self.privResultsEdit = QPlainTextEdit("")
         self.privResultsEdit.setReadOnly(True)
@@ -87,7 +89,9 @@ class SeedpickerTab(QWidget):
 
         self.pubResultsLabel = QLabel("")
         self.pubResultsLabel.setToolTip(
-            "For export to your online computer and eventaully other hardware wallets. This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
+            "For export to your online computer and eventaully other hardware wallets."
+            "<br/><br/>"
+            "This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
         )
         self.pubResultsROEdit = QPlainTextEdit("")
         self.pubResultsROEdit.setReadOnly(True)
@@ -95,6 +99,11 @@ class SeedpickerTab(QWidget):
 
         self.qrButton = QPushButton()
         self.qrButton.setText("QR")
+        self.qrButton.setToolTip(
+            "For transmitting to your online computer via webcam."
+            "<br/><br/>"
+            "This is a great way to preserve your airgap."
+        )
         self.qrButton.setHidden(True)
         self.qrButton.clicked.connect(self.make_qr_popup)
 
@@ -187,12 +196,12 @@ class SeedpickerTab(QWidget):
             ),
         ]
 
-        self.privResultsLabel.setText("<b>SECRET INFO</b> - guard this very carefully")
+        self.privResultsLabel.setText("<b>SECRET INFO</b>")
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
         pubkey_results_text = (
-            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+            f"<b>PUBLIC KEY INFO</b> - {'testnet' if self.IS_TESTNET else 'mainnet'}"
         )
         self.pubResultsLabel.setText(pubkey_results_text)
         self.pubResultsROEdit.setHidden(False)

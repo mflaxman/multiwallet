@@ -66,7 +66,7 @@ class SendTab(QWidget):
         self.button_label = QLabel("<b>Bitcoin Network</b>")
         self.button_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
 
-        self.infernetwork_button = QRadioButton("Smart Guess (default)")
+        self.infernetwork_button = QRadioButton("Automatic")
         self.infernetwork_button.setToolTip(
             "Non-experts should choose this option."
             "<br/><br/>"
@@ -86,7 +86,7 @@ class SendTab(QWidget):
         self.psbtSubmitButton = QPushButton("Decode Transaction")
         self.psbtSubmitButton.clicked.connect(self.decode_psbt)
 
-        self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b> (optional)")
+        self.fullSeedLabel = QLabel("<b>Full 24-Word Seed Phrase</b>")
         self.fullSeedLabel.setToolTip(
             "Needed to sign the PSBT. You can first decode the transaction and inspect it without supplying your seed phrase."
         )
@@ -109,7 +109,7 @@ class SendTab(QWidget):
 
         self.psbtSignedLabel = QLabel("")
         self.psbtSignedLabel.setToolTip(
-            "Signed version for your online computer to broadcast to the bitcoin network (once you have collected enough signatures)."
+            "Signed version for your online computer, which will aggregate signatures and then broadcast to the bitcoin network (once it has the required <i>m-of-n</i> signatures)."
         )
         self.psbtSignedROEdit = QPlainTextEdit("")
         self.psbtSignedROEdit.setReadOnly(True)

@@ -4,6 +4,7 @@ import re
 
 from PyQt5.QtWidgets import (
     QApplication,
+    QHBoxLayout,
     QVBoxLayout,
     QWidget,
     QLabel,
@@ -110,7 +111,7 @@ class ReceiveTab(QWidget):
 
     def __init__(self):
         super().__init__()
-        vbox = QVBoxLayout()
+        vbox = QVBoxLayout(self)
 
         self.descriptorLabel = QLabel("<b>Wallet Descriptor</b>")
         self.descriptorLabel.setToolTip(
@@ -122,45 +123,54 @@ class ReceiveTab(QWidget):
             "Something like this:\n\nwsh(sortedmulti(2,[deadbeef/48h/1h/0h/2h]xpub.../0/*,"
         )
 
-        self.limit_label = QLabel("<b>Limit of Addresses to Derive</b>")
-        self.limit_label.setToolTip("Address derivation is slow.")
+        self.addresses_label = QLabel("<b>Addresses to Derive</b>")
+        self.addresses_label.setToolTip("Address derivation without libsecp256k1 installed is slow, you may want to be targetted about which addresses to derive.")
+
+        hbox = QHBoxLayout(self)
+
+        self.limit_label = QLabel("<b>Limit</b>")
+        self.limit_label.setToolTip("The number of addresses to dervive.")
         self.limit_box = QSpinBox()
         self.limit_box.setValue(5)
         self.limit_box.setRange(1, 10000)
 
-        self.offset_label = QLabel("<b>Offset of Addresses to Derive</b>")
+        self.offset_label = QLabel("<b>Offset</b>")
         self.offset_label.setToolTip("Advanced users only.")
         self.offset_box = QSpinBox()
         self.offset_box.setValue(0)
         self.offset_box.setMinimum(0)
+
+        for widget in self.limit_label, self.limit_box, self.offset_label, self.offset_box:
+            hbox.addWidget(widget)
 
         self.descriptorSubmitButton = QPushButton("Derive Addresses")
         self.descriptorSubmitButton.clicked.connect(self.process_submit)
 
         self.addrResultsLabel = QLabel("")
         self.addrResultsLabel.setToolTip(
-            "These bitcoin addresses belong to the quorum of extended public keys above. You may want to print this out for future reference."
+            "These bitcoin addresses belong to the quorum of extended public keys above."
+            "<br/><br/>"
+            "You may want to print this out for future reference."
         )
-        self.addrResultsEdit = QPlainTextEdit("")
-        self.addrResultsEdit.setReadOnly(True)
-        self.addrResultsEdit.setHidden(True)
+        self.addrResultsROEdit = QPlainTextEdit("")
+        self.addrResultsROEdit.setReadOnly(True)
+        self.addrResultsROEdit.setHidden(True)
 
-        vbox.addWidget(self.descriptorLabel)
-        vbox.addWidget(self.descriptorEdit)
-        vbox.addWidget(self.limit_label)
-        vbox.addWidget(self.limit_box)
-        vbox.addWidget(self.offset_label)
-        vbox.addWidget(self.offset_box)
-        vbox.addWidget(self.descriptorSubmitButton)
-        vbox.addWidget(self.addrResultsLabel)
-        vbox.addWidget(self.addrResultsEdit)
+        for widget in self.descriptorLabel, self.descriptorEdit, self.addresses_label:
+            vbox.addWidget(widget)
+
+        vbox.addLayout(hbox)
+        # vbox.addStretch()  # FIXME
+        
+        for widget in self.descriptorSubmitButton, self.addrResultsLabel, self.addrResultsROEdit:
+            vbox.addWidget(widget)
 
         self.setLayout(vbox)
 
     def process_submit(self):
         # Clear any previous submission in case of errors
-        self.addrResultsEdit.clear()
-        self.addrResultsEdit.setHidden(True)
+        self.addrResultsROEdit.clear()
+        self.addrResultsROEdit.setHidden(True)
         self.addrResultsLabel.setText("")
         # TODO: why setText and not hide?
 
@@ -187,7 +197,7 @@ class ReceiveTab(QWidget):
             results_label += "<br>(this is ~100x faster with libsec installed)"
 
         self.addrResultsLabel.setText(results_label)
-        self.addrResultsEdit.setHidden(False)
+        self.addrResultsROEdit.setHidden(False)
 
         limit = self.limit_box.value()
         offset = self.offset_box.value()
@@ -202,5 +212,5 @@ class ReceiveTab(QWidget):
             is_testnet=pubkeys_info["is_testnet"],
         ):
             result = f"#{index}: {address}"
-            self.addrResultsEdit.appendPlainText(result)
+            self.addrResultsROEdit.appendPlainText(result)
             QApplication.processEvents()  # needed to stream output (otherwise terrible UX)

@@ -46,7 +46,7 @@ cd multiwallet
 python3 -m virtualenv .venv3
 source .venv3/bin/activate
 python3 setup.py develop
-python multiwallet_gui/app.py 
+python3 multiwallet_gui/app.py 
 ```
 
 ## Roadmap:
