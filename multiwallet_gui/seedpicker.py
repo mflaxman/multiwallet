@@ -4,8 +4,10 @@ from multiwallet_gui.helper import (
     BITCOIN_NETWORK_TOOLTIP,
     BITCOIN_TESTNET_TOOLTIP,
     BITCOIN_MAINNET_TOOLTIP,
+    create_qr_icon,
     _clean_submisission,
     _msgbox_err,
+    qr_dialog,
 )
 
 from PyQt5.QtWidgets import (
@@ -73,7 +75,6 @@ class SeedpickerTab(QWidget):
         self.testnet_button.setChecked(True)
 
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
-        self.firstWordsSubmitButton.setText("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
@@ -88,9 +89,14 @@ class SeedpickerTab(QWidget):
         self.pubResultsLabel.setToolTip(
             "For export to your online computer and eventaully other hardware wallets. This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
         )
-        self.pubResultsEdit = QPlainTextEdit("")
-        self.pubResultsEdit.setReadOnly(True)
-        self.pubResultsEdit.setHidden(True)
+        self.pubResultsROEdit = QPlainTextEdit("")
+        self.pubResultsROEdit.setReadOnly(True)
+        self.pubResultsROEdit.setHidden(True)
+
+        self.qrButton = QPushButton()
+        self.qrButton.setText("QR")
+        self.qrButton.setHidden(True)
+        self.qrButton.clicked.connect(self.make_qr_popup)
 
         for widget in (
             self.firstWordsLabel,
@@ -102,7 +108,8 @@ class SeedpickerTab(QWidget):
             self.privResultsLabel,
             self.privResultsEdit,
             self.pubResultsLabel,
-            self.pubResultsEdit,
+            self.pubResultsROEdit,
+            self.qrButton,
         ):
             self.layout.addWidget(widget)
 
@@ -116,9 +123,11 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.clear()
         self.privResultsEdit.setHidden(True)
         self.privResultsLabel.setText("")
-        self.pubResultsEdit.clear()
-        self.pubResultsEdit.setHidden(True)
+        self.pubResultsROEdit.clear()
+        self.pubResultsROEdit.setHidden(True)
         self.pubResultsLabel.setText("")
+        self.qrButton.setHidden(True)
+        self.qrButton.setText("")
         # TODO: why setText and not hide?
 
         first_words = _clean_submisission(self.firstWordsEdit.toPlainText())
@@ -182,8 +191,19 @@ class SeedpickerTab(QWidget):
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
-        self.pubResultsLabel.setText(
+        pubkey_results_text = (
             f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
         )
-        self.pubResultsEdit.setHidden(False)
-        self.pubResultsEdit.appendPlainText("\n".join(pub_to_display))
+        self.pubResultsLabel.setText(pubkey_results_text)
+        self.pubResultsROEdit.setHidden(False)
+        self.pubResultsROEdit.appendPlainText("\n".join(pub_to_display))
+
+        self.qrButton.setHidden(False)
+        self.qrButton.setText("QR")
+        self.qrButton.setIcon(create_qr_icon())
+
+    def make_qr_popup(self):
+        qr_dialog(
+            qr_text=self.pubResultsROEdit.toPlainText(),
+            window_title=self.pubResultsLabel.text(),
+        )
