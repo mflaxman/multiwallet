@@ -13,6 +13,10 @@ GUI version of CLI [multiwallet](https://twitter.com/mflaxman/status/13215030367
 
 ## Install
 
+#### Telegram Community Chat Group
+Ask Qs here: 
+<https://t.me/multiwallet>
+
 ### Pillow (for QR Codes)
 
 Mac:
@@ -46,7 +50,7 @@ cd multiwallet
 python3 -m virtualenv .venv3
 source .venv3/bin/activate
 python3 setup.py develop
-python multiwallet_gui/app.py 
+python3 multiwallet_gui/app.py 
 ```
 
 ## Roadmap:

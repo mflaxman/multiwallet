@@ -11,6 +11,7 @@ from multiwallet_gui.helper import (
 )
 
 from PyQt5.QtWidgets import (
+    QHBoxLayout,
     QLabel,
     QPlainTextEdit,
     QPushButton,
@@ -50,7 +51,8 @@ class SeedpickerTab(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.layout = QVBoxLayout()
+
+        vbox = QVBoxLayout(self)
 
         self.firstWordsLabel = QLabel("<b>First 23 Words of Your Seed Phrase</b>")
         self.firstWordsLabel.setToolTip(
@@ -66,6 +68,8 @@ class SeedpickerTab(QWidget):
         self.button_label = QLabel("<b>Bitcoin Network</b>")
         self.button_label.setToolTip(BITCOIN_NETWORK_TOOLTIP)
 
+        hbox = QHBoxLayout(self)
+
         self.mainnet_button = QRadioButton("Mainnet")
         self.mainnet_button.setToolTip(BITCOIN_MAINNET_TOOLTIP)
         self.mainnet_button.setChecked(False)
@@ -74,12 +78,17 @@ class SeedpickerTab(QWidget):
         self.testnet_button.setToolTip(BITCOIN_TESTNET_TOOLTIP)
         self.testnet_button.setChecked(True)
 
+        for widget in self.mainnet_button, self.testnet_button:
+            hbox.addWidget(widget)
+
         self.firstWordsSubmitButton = QPushButton("Calculate Full Seed")
         self.firstWordsSubmitButton.clicked.connect(self.process_submit)
 
         self.privResultsLabel = QLabel("")
         self.privResultsLabel.setToolTip(
-            "Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place. This represents your bitcoin <i>private</i> keys."
+            "Write the full mnemonic <b>offline</b> and store in a <b>secure</b> place."
+            "<br/><br/>"
+            "This represents your bitcoin <i>private</i> keys."
         )
         self.privResultsEdit = QPlainTextEdit("")
         self.privResultsEdit.setReadOnly(True)
@@ -87,7 +96,9 @@ class SeedpickerTab(QWidget):
 
         self.pubResultsLabel = QLabel("")
         self.pubResultsLabel.setToolTip(
-            "For export to your online computer and eventaully other hardware wallets. This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
+            "For export to your online computer and eventaully other hardware wallets."
+            "<br/><br/>"
+            "This represents your bitcoin <i>public</i> keys, which are neccesary-but-not-sufficient to spend your bitcoin."
         )
         self.pubResultsROEdit = QPlainTextEdit("")
         self.pubResultsROEdit.setReadOnly(True)
@@ -95,15 +106,20 @@ class SeedpickerTab(QWidget):
 
         self.qrButton = QPushButton()
         self.qrButton.setText("QR")
+        self.qrButton.setToolTip(
+            "For transmitting to your online computer via webcam."
+            "<br/><br/>"
+            "This is a great way to preserve your airgap."
+        )
         self.qrButton.setHidden(True)
         self.qrButton.clicked.connect(self.make_qr_popup)
 
+        for widget in (self.firstWordsLabel, self.firstWordsEdit, self.button_label):
+            vbox.addWidget(widget)
+
+        vbox.addLayout(hbox)
+
         for widget in (
-            self.firstWordsLabel,
-            self.firstWordsEdit,
-            self.button_label,
-            self.mainnet_button,
-            self.testnet_button,
             self.firstWordsSubmitButton,
             self.privResultsLabel,
             self.privResultsEdit,
@@ -111,12 +127,9 @@ class SeedpickerTab(QWidget):
             self.pubResultsROEdit,
             self.qrButton,
         ):
-            self.layout.addWidget(widget)
+            vbox.addWidget(widget)
 
-        self.setLayout(self.layout)
-
-        # show all the widgets  # TODO: needed?
-        self.show()
+        self.setLayout(vbox)
 
     def process_submit(self):
         # Clear any previous submission in case of errors
@@ -187,12 +200,12 @@ class SeedpickerTab(QWidget):
             ),
         ]
 
-        self.privResultsLabel.setText("<b>SECRET INFO</b> - guard this very carefully")
+        self.privResultsLabel.setText("<b>SECRET INFO</b>")
         self.privResultsEdit.setHidden(False)
         self.privResultsEdit.appendPlainText("\n".join(priv_to_display))
 
         pubkey_results_text = (
-            f"<b>PUBLIC KEY INFO</b> - {'Testnet' if self.IS_TESTNET else 'Mainnet'}"
+            f"<b>PUBLIC KEY INFO</b> - {'testnet' if self.IS_TESTNET else 'mainnet'}"
         )
         self.pubResultsLabel.setText(pubkey_results_text)
         self.pubResultsROEdit.setHidden(False)
